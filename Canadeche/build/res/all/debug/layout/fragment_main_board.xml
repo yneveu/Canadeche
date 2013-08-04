@@ -1,0 +1,48 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    tools:context=".MainActivity$BoardSectionFragment">
+
+
+    <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/message"
+            android:hint="@string/palmi_hint"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/postButton"/>
+
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/post_button"
+            android:id="@+id/postButton"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"/>
+
+    <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/messagesListView"
+            android:footerDividersEnabled="true"
+            android:background="@android:color/background_dark"
+            android:fastScrollEnabled="true"
+            android:transcriptMode="alwaysScroll"
+            android:stackFromBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_above="@+id/message"
+            android:layout_alignParentTop="true"/>
+
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Refresh"
+            android:id="@+id/refreshButton"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"/>
+
+</RelativeLayout>
+<!-- From: file:/home/yann/AndroidStudioProjects/Canadeche/Canadeche/src/main/res/layout/fragment_main_board.xml -->

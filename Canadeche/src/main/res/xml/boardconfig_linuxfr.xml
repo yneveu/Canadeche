@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                      android:title="linuxfr">
+<PreferenceCategory
+            android:title="@string/pref_category_board_general">
+
+    <CheckBoxPreference
+            android:key="boardconfig_linuxfr_checkbox_boardenabled"
+            android:title="@string/pref_board_enabled_title"
+            android:summary="@string/pref_boardsenabled_summary"
+            android:defaultValue="true" />
+
+
+    <EditTextPreference
+            android:key="boardconfig_linuxfr_edittext_boardname"
+            android:title="@string/pref_board_name_title"
+            android:summary="@string/pref_board_name_summary"
+            android:dialogTitle="@string/pref_board_name_dialogtitle" />
+
+    <EditTextPreference
+            android:key="boardconfig_linuxfr_edittext_boardalias"
+            android:title="@string/pref_board_alias_title"
+            android:summary="@string/pref_board_alias_summary"
+            android:dialogTitle="@string/pref_board_alias_dialogtitle" />
+
+    <EditTextPreference
+            android:key="boardconfig_linuxfr_edittext_boardcolor"
+            android:title="@string/pref_board_color_title"
+            android:summary="@string/pref_board_color_summary"
+            android:dialogTitle="@string/pref_board_color_dialogtitle" />
+
+    <EditTextPreference
+            android:key="boardconfig_linuxfr_edittext_boardrefresh"
+            android:title="@string/pref_board_refresh_title"
+            android:summary="@string/pref_board_refresh_summary"
+            android:dialogTitle="@string/pref_board_refresh_dialogtitle" />
+</PreferenceCategory>
+
+<PreferenceCategory
+            android:title="@string/pref_category_board_authentication">
+
+    <Preference android:title="Log in linuxfr.org"
+                android:key="login_linuxfr_button"
+                android:summary="Perfoms an authentication on linuxfr.org site"/>
+
+    <EditTextPreference
+            android:key="boardconfig_linuxfr_edittext_boardlogin"
+            android:title="@string/pref_board_login_title"
+            android:summary="@string/pref_board_login_summary"
+            android:dialogTitle="@string/pref_board_login_dialogtitle" />
+
+    <EditTextPreference
+            android:key="boardconfig_linuxfr_edittext_boardua"
+            android:title="@string/pref_board_ua_title"
+            android:summary="@string/pref_board_ua_summary"
+            android:dialogTitle="@string/pref_board_ua_dialogtitle" />
+
+    <EditTextPreference
+            android:key="boardconfig_linuxfr_edittext_boardcookie"
+            android:title="@string/pref_board_cookie_title"
+            android:summary="@string/pref_board_cookie_summary"
+            android:dialogTitle="@string/pref_board_cookie_dialogtitle" />
+</PreferenceCategory>
+
+<PreferenceCategory
+            android:title="@string/pref_category_board_backend">
+
+    <EditTextPreference
+            android:key="boardconfig_linuxfr_edittext_host"
+            android:title="@string/pref_board_host_title"
+            android:summary="@string/pref_board_host_summary"
+            android:defaultValue="linuxfr.org" />
+
+    <EditTextPreference
+            android:key="boardconfig_linuxfr_edittext_boardslipurl"
+            android:title="@string/pref_board_slipsurl_title"
+            android:summary="@string/pref_board_slipsurl_summary"
+            android:dialogTitle="@string/pref_board_slipsurl_dialogtitle"
+            android:defaultValue="http://linuxfr.org/board/index.xml"/>
+
+    <EditTextPreference
+            android:key="boardconfig_linuxfr_edittext_boardposturl"
+            android:title="@string/pref_board_posturl_title"
+            android:summary="@string/pref_board_postsurl_summary"
+            android:dialogTitle="@string/pref_board_postsurl_dialogtitle"
+            android:defaultValue="http://linuxfr.org/board" />
+
+    <EditTextPreference
+            android:key="boardconfig_linuxfr_edittext_referer"
+            android:title="@string/pref_board_referer_title"
+            android:summary="@string/pref_board_referer_summary"
+            android:defaultValue="http://linuxfr.org/board" />
+
+    <CheckBoxPreference
+            android:key="boardconfig_linuxfr_checkbox_boardtagsencoded"
+            android:title="@string/pref_board_tagsencoded_title"
+            android:summary="@string/pref_board_tagsencoded_summary"
+            android:defaultValue="true" />
+    />
+</PreferenceCategory>
+
+    </PreferenceScreen>
+</PreferenceScreen>
