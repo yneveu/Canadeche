@@ -70,6 +70,10 @@ public class BoardFragment extends Fragment {
             super.onActivityCreated(savedInstanceState);
         }
 
+        public String getBoardName(){
+            return boardName;
+        }
+
         public void displayTotoz( String _totoz){
 
             LayoutInflater inflater = LayoutInflater.from( getActivity());
@@ -162,6 +166,7 @@ public class BoardFragment extends Fragment {
 
         public void refreshContent(){
             Log.d(TAG, "adapter " + adapter);
+            mds.open();
             messages.clear();
             messages.addAll(mds.getAllMessages(boardName));
             adapter.notifyDataSetChanged();

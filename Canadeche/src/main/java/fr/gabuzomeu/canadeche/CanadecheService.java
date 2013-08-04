@@ -130,6 +130,7 @@ public class CanadecheService extends Service {
 
         @Override
         protected Void doInBackground( Void... arg0) {
+            reloadBoardsConfig();
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
             boolean sticky = prefs.getBoolean( "pref_stickyservice", true);
             if( sticky)

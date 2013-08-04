@@ -1,7 +1,6 @@
 package fr.gabuzomeu.canadeche;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -31,9 +30,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -64,9 +61,6 @@ public class MainActivityDrawer extends Activity {
 
     BoardFragment currentFragment;
 
-    Myreceiver receiver;
-    IntentFilter filter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
        super.onCreate(savedInstanceState);
@@ -86,9 +80,11 @@ public class MainActivityDrawer extends Activity {
                     public void onSharedPreferenceChanged( SharedPreferences prefs, String key) {
                         if( debug)
                             Log.d("TAG", "Preferences " + key + " has been changed");
-                            enabledBoardsNameList.clear();
-                            enabledBoardsNameList.addAll( getEnabledBoardsNames());
-                            drawerBoardsListAdapter.notifyDataSetChanged();
+                        mBoundService.refresh( currentFragment.getBoardName() );
+                        enabledBoardsNameList.clear();
+                        enabledBoardsNameList.addAll( getEnabledBoardsNames());
+                        drawerBoardsListAdapter.notifyDataSetChanged();
+
 
                     }
                 };
@@ -116,8 +112,7 @@ public class MainActivityDrawer extends Activity {
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
 
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
+
 
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,                  /* host Activity */
@@ -127,7 +122,8 @@ public class MainActivityDrawer extends Activity {
                 R.string.drawer_close  /* "close drawer" description for accessibility */
         ) {
             public void onDrawerClosed(View view) {
-                getActionBar().setTitle(mTitle);
+                //getActionBar().setTitle(mTitle);
+                getActionBar().setTitle( currentFragment.getBoardName());
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
 
@@ -137,14 +133,8 @@ public class MainActivityDrawer extends Activity {
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-        receiver = new Myreceiver( );
-        filter = new IntentFilter( );
-        filter.addAction( "android.intent.action.VIEW");
-        filter.addDataScheme("totoz");
-
-        //filter.addAction("android.intent.action.VIEW");
-        registerReceiver(receiver, filter);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
 
         /**Todo Remove that*/
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -157,11 +147,13 @@ public class MainActivityDrawer extends Activity {
     protected void onNewIntent(Intent intent)
     {
         super.onNewIntent(intent);
-
-        String totoz = intent.getDataString();
-        totoz = totoz.substring( 10, totoz.length()-1);
-        Toast.makeText( getApplicationContext(), "Totoz received: " + totoz, Toast.LENGTH_SHORT).show();
-        currentFragment.displayTotoz( totoz );
+        if( intent.getScheme() == "totoz"){
+            String totoz = intent.getDataString();
+            totoz = totoz.substring( 10, totoz.length()-1);
+            if( debug)
+                Toast.makeText( getApplicationContext(), "Totoz received: " + totoz, Toast.LENGTH_SHORT).show();
+            currentFragment.displayTotoz( totoz );
+        }
     }
 
 
@@ -169,13 +161,11 @@ public class MainActivityDrawer extends Activity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             TextView tv= (TextView)view.findViewById( R.id.drawer_element_textview);
-
             selectItem(position, tv.getText().toString());
         }
     }
 
     private void selectItem(int position, String boardName) {
-        Log.d(TAG, "Before create fragment, mBoudService " + mBoundService);
         currentFragment = new BoardFragment( mBoundService);
         Bundle args = new Bundle();
         args.putInt( BoardFragment.ARG_SECTION_NUMBER, position);
@@ -185,9 +175,8 @@ public class MainActivityDrawer extends Activity {
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_frame, currentFragment).commit();
 
-        // update selected item and title, then close the drawer
         mDrawerList.setItemChecked(position, true);
-        setTitle( (String)enabledBoardsNameList.get( position));
+        getActionBar().setTitle( (String)enabledBoardsNameList.get( position));
         mDrawerLayout.closeDrawer(mDrawerList);
     }
 
@@ -203,22 +192,19 @@ public class MainActivityDrawer extends Activity {
     /**Browse all sharedPreferences to find which boards are enabled*/
     public ArrayList getEnabledBoardsNames(){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        //Log.d( TAG,  "IN getEnabledBoardsNames");
 
         ArrayList boardNamesArray = new ArrayList();
 
         Map<String,?> keys = prefs.getAll();
 
         for(Map.Entry<String,?> entry : keys.entrySet()){
-           // Log.d( TAG, "Prefs Entry" + entry.getKey() + " Value: " + entry.getValue());
             if( entry.getKey().contains( "checkbox_boardenabled") && Boolean.parseBoolean( entry.getValue().toString()) == true){
                 StringTokenizer st = new StringTokenizer( entry.getKey(), "_");
                 st.nextToken();
                 String boardId = st.nextToken();
                 boardNamesArray.add( boardId);
-                //this.notifyDataSetChanged();
-
-                Log.d("BOARDS",  boardId + " ENABLED");
+                if( debug)
+                    Log.d("BOARDS",  boardId + " ENABLED");
             }
         }
     return boardNamesArray;
@@ -229,6 +215,11 @@ public class MainActivityDrawer extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
         switch(item.getItemId()) {
             case R.id.action_settings:
                 Intent intent = new Intent(this, SettingsActivity.class);
@@ -242,15 +233,13 @@ public class MainActivityDrawer extends Activity {
     }
 
 
-
-
-
     /*Connection to service*/
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             mBoundService = ((CanadecheService.LocalBinder)service).getService();
             Log.d( TAG, "SERVICE connected: " + mBoundService);
-            Toast.makeText( MainActivityDrawer.this, R.string.local_service_connected, Toast.LENGTH_SHORT).show();
+            if( debug)
+                Toast.makeText( MainActivityDrawer.this, R.string.local_service_connected, Toast.LENGTH_SHORT).show();
             mBoundService.plop();
             selectItem( 0, (String)enabledBoardsNameList.get( 0));
         }
@@ -289,7 +278,6 @@ public class MainActivityDrawer extends Activity {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive( Context context, Intent intent) {
-            // Get extra data included in the Intent
             String message = intent.getStringExtra("message");
             if( debug){
                 Log.d("receiver", "Got message: " + message);
@@ -308,38 +296,22 @@ public class MainActivityDrawer extends Activity {
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        // Sync the toggle state after onRestoreInstanceState has occurred.
         mDrawerToggle.syncState();
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        // Pass any configuration change to the drawer toggls
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
-
-
-
-    public class Myreceiver extends BroadcastReceiver{
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d( TAG, "MyReceiver: broadcast received-------------------------------------------------------------------------------------------");
-            Toast.makeText( getApplicationContext(), "Totoz received", Toast.LENGTH_SHORT).show();
-        }
-    }
-
 
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver( receiver, filter);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver( receiver);
     }
 }
