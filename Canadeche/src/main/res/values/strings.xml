@@ -57,5 +57,7 @@
     <string name="pref_stickyservice_summary">Should boards bu updated in background?</string>
     <string name="pref_stickyservice_title">Background updates</string>
     <string name="ok_button">OK</string>
+    <string name="pref_board_quiet_title">Quiet board</string>
+    <string name="pref_quietboard_summary">Notify on every new post on board</string>
 
 </resources>

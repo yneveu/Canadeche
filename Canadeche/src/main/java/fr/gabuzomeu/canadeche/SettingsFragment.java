@@ -78,6 +78,8 @@ public class SettingsFragment extends PreferenceFragment {
                         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences( getActivity());
                         SharedPreferences.Editor editor = settings.edit();
                         editor.putString( "boardconfig_linuxfr_edittext_boardcookie", "linuxfr.org_session=" + cookie.getValue());
+                        editor.putString( "boardconfig_linuxfr_edittext_boardlogin", usernameInput.getText().toString());
+
                         editor.commit();
                     }
                 }
