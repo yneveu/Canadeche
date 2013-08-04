@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+            android:title="@string/general_preferences"
+            android:key="pref_key_general_settings">
+        <CheckBoxPreference
+                android:key="pref_debug"
+                android:summary="@string/pref_debug_summary"
+                android:title="@string/pref_debug_title"
+                android:defaultValue="false" />
+
+        <CheckBoxPreference
+                android:key="pref_fullscreen"
+                android:summary="@string/pref_fullscreen_summary"
+                android:title="@string/pref_fullscreen_title"
+                android:defaultValue="false" />
+
+        <CheckBoxPreference
+                android:key="pref_stickyservice"
+                android:summary="@string/pref_stickyservice_summary"
+                android:title="@string/pref_stickyservice_title"
+                android:defaultValue="false" />
+
+        <EditTextPreference
+                android:key="pref_service_update_seconds"
+                android:summary="@string/pref_service_update_seconds_summary"
+                android:title="@string/pref_service_update_seconds_title"
+                android:defaultValue="300"
+                android:numeric="integer"
+                />
+
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/boards_list">
+    </PreferenceCategory>
+
+
+    </PreferenceScreen><!-- From: file:/home/yann/AndroidStudioProjects/Canadeche/Canadeche/src/main/res/xml/preferences.xml -->
