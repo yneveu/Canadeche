@@ -18,10 +18,7 @@
     <string name="post_button">Post</string>
     <string name="pref_board_alias_dialogtitle">Board\'s alias</string>
     <string name="pref_board_alias_summary">Board\'s alias</string>
-    <string name="pref_board_alias_title">Alias</string>
-    <string name="pref_board_color_dialogtitle">Board\'s color</string>
-    <string name="pref_board_color_summary">Board\'s color</string>
-    <string name="pref_board_color_title">Color</string>
+    <string name="pref_board_alias_title">Alias (not used now)</string>
     <string name="pref_board_cookie_dialogtitle">Board\'s cookies</string>
     <string name="pref_board_cookie_summary">Board\'s cookies</string>
     <string name="pref_board_cookie_title">Cookies</string>
@@ -39,9 +36,6 @@
     <string name="pref_board_posturl_title">Post url</string>
     <string name="pref_board_referer_summary">Referer sent in post request</string>
     <string name="pref_board_referer_title">Referer post</string>
-    <string name="pref_board_refresh_dialogtitle">Board\'s refresh interval (s)</string>
-    <string name="pref_board_refresh_summary">Board\'s refresh interval (s)</string>
-    <string name="pref_board_refresh_title">Refresh interval</string>
     <string name="pref_board_slipsurl_dialogtitle">Board\'s backend url</string>
     <string name="pref_board_slipsurl_summary">Board\'s backend url</string>
     <string name="pref_board_slipsurl_title">Backend url</string>

@@ -24,17 +24,7 @@
             android:summary="@string/pref_board_alias_summary"
             android:dialogTitle="@string/pref_board_alias_dialogtitle" />
 
-    <EditTextPreference
-            android:key="boardconfig_euromussels_edittext_boardcolor"
-            android:title="@string/pref_board_color_title"
-            android:summary="@string/pref_board_color_summary"
-            android:dialogTitle="@string/pref_board_color_dialogtitle" />
 
-    <EditTextPreference
-            android:key="boardconfig_euromussels_edittext_boardrefresh"
-            android:title="@string/pref_board_refresh_title"
-            android:summary="@string/pref_board_refresh_summary"
-            android:dialogTitle="@string/pref_board_refresh_dialogtitle" />
 </PreferenceCategory>
 
 <PreferenceCategory

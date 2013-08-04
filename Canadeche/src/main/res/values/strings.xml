@@ -15,15 +15,9 @@
     <string name="pref_board_name_title">Name</string>
     <string name="pref_board_name_summary">Board\'s name</string>
     <string name="pref_board_name_dialogtitle">Board\'s name</string>
-    <string name="pref_board_alias_title">Alias</string>
+    <string name="pref_board_alias_title">Alias (not used now)</string>
     <string name="pref_board_alias_summary">Board\'s alias</string>
     <string name="pref_board_alias_dialogtitle">Board\'s alias</string>
-    <string name="pref_board_color_title">Color</string>
-    <string name="pref_board_color_summary">Board\'s color</string>
-    <string name="pref_board_color_dialogtitle">Board\'s color</string>
-    <string name="pref_board_refresh_title">Refresh interval</string>
-    <string name="pref_board_refresh_summary">Board\'s refresh interval (s)</string>
-    <string name="pref_board_refresh_dialogtitle">Board\'s refresh interval (s)</string>
     <string name="pref_category_board_authentication">Authentication</string>
     <string name="pref_board_login_title">Login</string>
     <string name="pref_board_login_summary">Board\'s login</string>
