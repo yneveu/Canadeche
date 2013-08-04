@@ -175,7 +175,7 @@ public class CanadecheService extends Service {
             try{
                 URL url = new URL( boardBackenUrl );
                 URLConnection connection = url.openConnection();
-                connection.setRequestProperty("User-Agent", MainActivityDrawer.appName + "/" + MainActivityDrawer.appVersion);
+                connection.setRequestProperty("User-Agent", MainActivityDrawer.appName + "/" + MainActivityDrawer.appVersion + " (" +  android.os.Build.MANUFACTURER + " " + android.os.Build.PRODUCT + " " + android.os.Build.MODEL + ")");
 
                 File tmpFile = File.createTempFile( (String)boardsId.get( i), "canadeche", getApplicationContext().getCacheDir());
                 if( debug)
