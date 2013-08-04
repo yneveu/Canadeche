@@ -27,7 +27,9 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -172,10 +174,13 @@ public class CanadecheService extends Service {
 
             try{
                 URL url = new URL( boardBackenUrl );
+                URLConnection connection = url.openConnection();
+                connection.setRequestProperty("User-Agent", MainActivityDrawer.appName + "/" + MainActivityDrawer.appVersion);
+
                 File tmpFile = File.createTempFile( (String)boardsId.get( i), "canadeche", getApplicationContext().getCacheDir());
                 if( debug)
                     Log.d( TAG, tmpFile.getAbsolutePath());
-                BufferedInputStream in = new BufferedInputStream(url.openStream());
+                BufferedInputStream in = new BufferedInputStream((InputStream) connection.getContent(new Class[]{ InputStream.class }));
                 FileOutputStream fos = new FileOutputStream( tmpFile.getPath());
                 BufferedOutputStream bout = new BufferedOutputStream( fos,1024);
                 byte[] data = new byte[1024];
