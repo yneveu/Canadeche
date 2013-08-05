@@ -147,12 +147,14 @@ public class MainActivityDrawer extends Activity {
     protected void onNewIntent(Intent intent)
     {
         super.onNewIntent(intent);
-        if( intent.getScheme() == "totoz"){
-            String totoz = intent.getDataString();
-            totoz = totoz.substring( 10, totoz.length()-1);
-            if( debug)
-                Toast.makeText( getApplicationContext(), "Totoz received: " + totoz, Toast.LENGTH_SHORT).show();
-            currentFragment.displayTotoz( totoz );
+        if( intent.getScheme() != null){
+            if( intent.getScheme().compareTo( "totoz") == 0){
+                String totoz = intent.getDataString();
+                totoz = totoz.substring( 10, totoz.length()-1);
+                if( debug)
+                    Toast.makeText( getApplicationContext(), "Totoz received: " + totoz, Toast.LENGTH_SHORT).show();
+                currentFragment.displayTotoz( totoz );
+            }
         }
     }
 
