@@ -120,10 +120,11 @@ public class CanadecheService extends Service {
         public void run(){
                 Log.d(TAG, ">>>REFRESH ");
                 reloadBoardsConfig();
-                if( getMainLooper() == null)
-                    Looper.prepare();
-                new updateAsyncTask().execute();
 
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                boolean sticky = prefs.getBoolean( "pref_stickyservice", true);
+                if( sticky)
+                    fetchNewPosts( true);
                 }
      };
 

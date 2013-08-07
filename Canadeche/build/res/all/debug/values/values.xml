@@ -34,6 +34,7 @@
     <string name="pref_board_postsurl_dialogtitle">Board\'s post url</string>
     <string name="pref_board_postsurl_summary">Board\'s post url</string>
     <string name="pref_board_posturl_title">Post url</string>
+    <string name="pref_board_quiet_title">Quiet board</string>
     <string name="pref_board_referer_summary">Referer sent in post request</string>
     <string name="pref_board_referer_title">Referer post</string>
     <string name="pref_board_slipsurl_dialogtitle">Board\'s backend url</string>
@@ -54,6 +55,9 @@
     <string name="pref_dummy_title">Title dummy</string>
     <string name="pref_fullscreen_summary">Display app in full screen mode</string>
     <string name="pref_fullscreen_title">Fullscreen</string>
+    <string name="pref_max_post_displayed_summary">Maximum posts displayed by board</string>
+    <string name="pref_max_post_displayed_title">Posts by boards</string>
+    <string name="pref_quietboard_summary">Notify on every new post on board</string>
     <string name="pref_service_update_seconds_summary">Number of seconds between two service update</string>
     <string name="pref_service_update_seconds_title">Service update frequency</string>
     <string name="pref_stickyservice_summary">Should boards bu updated in background?</string>

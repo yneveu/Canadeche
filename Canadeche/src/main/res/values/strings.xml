@@ -59,5 +59,7 @@
     <string name="ok_button">OK</string>
     <string name="pref_board_quiet_title">Quiet board</string>
     <string name="pref_quietboard_summary">Notify on every new post on board</string>
+    <string name="pref_max_post_displayed_summary">Maximum posts displayed by board</string>
+    <string name="pref_max_post_displayed_title">Posts by boards</string>
 
 </resources>
