@@ -12,6 +12,12 @@
             android:title="@string/pref_board_enabled_title"
             android:summary="@string/pref_boardsenabled_summary" />
 
+    <CheckBoxPreference
+            android:key="boardconfig_see_checkbox_quietboard"
+            android:title="@string/pref_board_quiet_title"
+            android:summary="@string/pref_quietboard_summary"
+            android:defaultValue="false" />
+
     <EditTextPreference
             android:key="boardconfig_see_edittext_boardname"
             android:title="@string/pref_board_name_title"

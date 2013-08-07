@@ -10,7 +10,9 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -122,11 +124,12 @@ public class MessagesDataSource {
             final String seconds=sClock.substring( 12,14);
             String cNorloge =  hour + ":" + minutes + ":" + seconds;
 
-
-            Notification noti = new Notification.Builder( context)
-                    .setContentTitle( reason)
+NotificationCompat plop;
+            Notification noti =  new NotificationCompat.Builder( context)
+                    .setContentTitle(reason)
                     .setContentText(inputMessage.getBoard() + " (" + cNorloge + ") : " + inputMessage.getMessage())
                     .setSmallIcon(R.drawable.ic_launcher)
+                    .setLights(Color.YELLOW, 500, 500)
                     .setContentIntent(pIntent).build();
 
 
@@ -139,10 +142,13 @@ public class MessagesDataSource {
        List<Message> messages = new ArrayList<Message>();
        Cursor cursor = database.query( SqliteHelper.MESSAGES_TABLE, allColumns, SqliteHelper.COLUMN_BOARD_ID + " == '" + inputBoard +"'", null, null, null, SqliteHelper.COLUMN_TIME, null);
 
-       if( cursor.getCount() < 50)
+       String postsAsString = PreferenceManager.getDefaultSharedPreferences( context).getString( "pref_max_post_displayed", "100");
+       int maxPosts = Integer.parseInt( postsAsString);
+
+       if( cursor.getCount() < maxPosts )
             cursor.moveToFirst();
         else
-           cursor.moveToPosition( cursor.getCount() -49);
+           cursor.moveToPosition( cursor.getCount() - maxPosts );
 
         while (!cursor.isAfterLast()) {
             Message mess = new Message();
