@@ -7,6 +7,9 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class BoardParser extends DefaultHandler {
@@ -17,16 +20,35 @@ public class BoardParser extends DefaultHandler {
     private boolean in_mytag = false;
     private boolean in_info = false;
     private boolean in_message = false;
+    private boolean in_a = false;
     private boolean in_login = false;
     private boolean in_post = false;
     private boolean in_board = false;
     private boolean in_site = false;
     private boolean in_timezone = false;
 
+
+    private String boardName;
+    private Context context;
+    private boolean debug = false;
+
+    private boolean isTagEncoded = true;
+
     private String TAG = "CanadecheBoardParser";
     private Message message;
 
     ArrayList<Message> messages;
+    private SharedPreferences prefs;
+
+
+    public BoardParser( Context ctx, String _boardName){
+        boardName = _boardName;
+        prefs = PreferenceManager.getDefaultSharedPreferences( ctx);
+        isTagEncoded = prefs.getBoolean( "boardconfig_"+ _boardName + "_checkbox_boardtagsencoded", true);
+        debug = prefs.getBoolean("pref_debug", false);
+        if( debug)
+            Log.d( TAG, "isTagEncoded  " + _boardName + " = " + isTagEncoded);
+    }
 
     public ArrayList<Message> getMessages() {
         return messages;
@@ -60,10 +82,13 @@ public class BoardParser extends DefaultHandler {
             this.in_login=true;
         }else if ( localName.equals("post")){
             message=new Message();
+            message.setMessage( "");
             message.setId( Integer.parseInt( atts.getValue("id")));
             message.setTime( Long.parseLong( atts.getValue("time")));
-
             this.in_post=true;
+        }else if ( localName.equals("a") && this.in_message == true){
+            message.setMessage( message.getMessage() + " " + atts.getValue("href") + " ");
+            this.in_a=true;
         }else if ( localName.equals("board")){
             this.in_board=true;
         }else if ( localName.equals("timezone")){
@@ -71,8 +96,6 @@ public class BoardParser extends DefaultHandler {
         }
 
     }
-
-
 
 
     @Override
@@ -95,16 +118,14 @@ public class BoardParser extends DefaultHandler {
             this.in_board=false;
         }else if ( localName.equals("timezone")){
             this.in_timezone=false;
-        }
-
-
-
+        }else if ( localName.equals("a")){
+            this.in_a=false;
+    }
     }
 
     @Override
     public void characters(char ch[], int start, int length) {
         String cdata = new String(ch, start, length);
-        // cdata = cdata.trim();
 
         if( this.in_time){
             message.setTime( Integer.parseInt( cdata ));
@@ -116,12 +137,13 @@ public class BoardParser extends DefaultHandler {
             message.setInfo( cdata );
             this.in_info=false;
         }else if( this.in_message ){
-            if( message.getMessage() != null ){
-                message.setMessage( message.getMessage() + cdata );
+            if( !this.in_a){
+                if( message.getMessage() != null){
+                    message.setMessage( message.getMessage() + cdata );
+                }
+                else
+                    message.setMessage( cdata);
             }
-            else
-                message.setMessage( cdata);
-            //this.in_message=false;
         }else if( this.in_login ){
             message.setLogin( cdata );
         }else if( this.in_board ){
