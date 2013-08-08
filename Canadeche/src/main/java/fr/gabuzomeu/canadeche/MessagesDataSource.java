@@ -124,7 +124,6 @@ public class MessagesDataSource {
             final String seconds=sClock.substring( 12,14);
             String cNorloge =  hour + ":" + minutes + ":" + seconds;
 
-NotificationCompat plop;
             Notification noti =  new NotificationCompat.Builder( context)
                     .setContentTitle(reason)
                     .setContentText(inputMessage.getBoard() + " (" + cNorloge + ") : " + inputMessage.getMessage())

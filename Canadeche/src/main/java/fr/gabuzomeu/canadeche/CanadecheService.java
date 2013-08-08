@@ -198,7 +198,7 @@ public class CanadecheService extends Service {
                 SAXParser sp = spf.newSAXParser();
                 XMLReader xr = sp.getXMLReader();
 
-                BoardParser bParser = new BoardParser();
+                BoardParser bParser = new BoardParser( this, (String)boardsId.get( i));
                 xr.setContentHandler( bParser);
                 FileReader fr = new FileReader( tmpFile);
                 xr.parse(new InputSource( fr));
