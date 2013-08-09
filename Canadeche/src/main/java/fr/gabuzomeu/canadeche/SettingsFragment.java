@@ -40,6 +40,10 @@ public class SettingsFragment extends PreferenceFragment {
         addPreferencesFromResource( R.xml.boardconfig_gabuzomeu);
         addPreferencesFromResource( R.xml.boardconfig_euromussels);
         addPreferencesFromResource( R.xml.boardconfig_see);
+        addPreferencesFromResource( R.xml.boardconfig_shoop);
+        addPreferencesFromResource( R.xml.boardconfig_batavie);
+        addPreferencesFromResource( R.xml.boardconfig_moules);
+        addPreferencesFromResource( R.xml.boardconfig_bouchot);
 
         Preference button = (Preference)findPreference("login_linuxfr_button");
         button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
