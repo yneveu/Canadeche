@@ -31,7 +31,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 public class MainActivityDrawer extends Activity {
@@ -209,6 +211,14 @@ public class MainActivityDrawer extends Activity {
                     Log.d("BOARDS",  boardId + " ENABLED");
             }
         }
+
+  /*      Set<String> set = new HashSet<String>();
+        set.addAll( boardNamesArray);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putStringSet( "enabled_boards", set);
+        editor.commit();
+*/
+
     return boardNamesArray;
     }
 

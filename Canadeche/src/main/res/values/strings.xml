@@ -61,5 +61,9 @@
     <string name="pref_quietboard_summary">Notify on every new post on board</string>
     <string name="pref_max_post_displayed_summary">Maximum posts displayed by board</string>
     <string name="pref_max_post_displayed_title">Posts by boards</string>
+    <string name="reorder_boards">Change boards order</string>
+    <string name="reorder_boards_summary">Change the boards\' tab order</string>
+    <string name="title_activity_reorder_boards">\@strings/reorder_boards</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>
