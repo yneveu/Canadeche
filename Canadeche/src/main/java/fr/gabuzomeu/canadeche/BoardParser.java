@@ -56,13 +56,15 @@ public class BoardParser extends DefaultHandler {
 
     @Override
     public void startDocument() throws SAXException {
-        Log.i( TAG, "Parsing started");
+        if( debug)
+            Log.d( TAG, "Parsing started");
         messages=new ArrayList();
     }
 
     @Override
     public void endDocument() throws SAXException {
-        Log.i( TAG, "Parsing ended " + messages.size() +  " messages parsed" );
+        if( debug)
+        Log.d( TAG, "Parsing ended " + messages.size() +  " messages parsed" );
     }
 
 
@@ -147,8 +149,6 @@ public class BoardParser extends DefaultHandler {
         }else if( this.in_login ){
             message.setLogin( cdata );
         }else if( this.in_board ){
-            //message.setBoard("TEST");
-            //message.setBoard( new String( ch, start, length) );
             this.in_board=false;
         }
 

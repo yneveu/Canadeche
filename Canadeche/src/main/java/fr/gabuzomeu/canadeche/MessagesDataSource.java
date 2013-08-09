@@ -111,6 +111,10 @@ public class MessagesDataSource {
         return -1;
     }
 
+
+
+
+
         private void notifyOnNewPost( Message inputMessage, String reason){
             final NotificationManager notificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -130,7 +134,6 @@ public class MessagesDataSource {
                     .setSmallIcon(R.drawable.ic_launcher)
                     .setLights(Color.YELLOW, 500, 500)
                     .setContentIntent(pIntent).build();
-
 
             noti.flags |= Notification.FLAG_AUTO_CANCEL;
             notificationManager.notify(0, noti);

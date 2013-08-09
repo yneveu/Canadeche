@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.StringTokenizer;
 
 public class MainActivityDrawer extends Activity {
@@ -53,7 +54,7 @@ public class MainActivityDrawer extends Activity {
 
     private SharedPreferences prefs;
     private SharedPreferences.OnSharedPreferenceChangeListener prefsListener;
-    private ArrayList enabledBoardsNameList;
+    private ArrayList enabledBoardsNameList = new ArrayList();
 
     ArrayAdapter<String> drawerBoardsListAdapter;
 
@@ -82,19 +83,33 @@ public class MainActivityDrawer extends Activity {
                     public void onSharedPreferenceChanged( SharedPreferences prefs, String key) {
                         if( debug)
                             Log.d("TAG", "Preferences " + key + " has been changed");
-                        mBoundService.refresh( currentFragment.getBoardName() );
-                        enabledBoardsNameList.clear();
-                        enabledBoardsNameList.addAll( getEnabledBoardsNames());
-                        drawerBoardsListAdapter.notifyDataSetChanged();
+
+                        if( key.compareTo( "boards_enabled_reorder_timestamp") == 0 ){
+                            Log.d("TAG", "Boards order changed " );
+                            enabledBoardsNameList.clear();
+                            enabledBoardsNameList.addAll( readBoardsListFromPreferences());
+                            drawerBoardsListAdapter.notifyDataSetChanged();
+                        }
+
+                        if( key.contains( "checkbox_boardenabled")){
+                            Log.d("TAG", "Board state changed: " + key );
+                            refreshEnabledBoardsNames();
+                            enabledBoardsNameList.clear();
+                            enabledBoardsNameList.addAll( readBoardsListFromPreferences());
+                            drawerBoardsListAdapter.notifyDataSetChanged();
+                            if( currentFragment != null)
+                                mBoundService.refresh( currentFragment.getBoardName() );
+                        }
+
 
 
                     }
                 };
 
-        prefs.registerOnSharedPreferenceChangeListener( prefsListener);
+        prefs.registerOnSharedPreferenceChangeListener(prefsListener);
 
         doBindService();
-        LocalBroadcastManager.getInstance(this).registerReceiver( mMessageReceiver, new IntentFilter( "refresh-board"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("refresh-board"));
 
         if( PreferenceManager.getDefaultSharedPreferences( this).getBoolean( "pref_fullscreen", false) ){
             requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -107,14 +122,18 @@ public class MainActivityDrawer extends Activity {
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
-        enabledBoardsNameList = getEnabledBoardsNames();
+
+
+        enabledBoardsNameList = readBoardsListFromPreferences();
+        //Should be called at first start
+        if( enabledBoardsNameList.size() == 0)
+            enabledBoardsNameList = refreshEnabledBoardsNames();
+
+
         drawerBoardsListAdapter = new ArrayAdapter<String>(this, R.layout.drawer_list_item, enabledBoardsNameList);
         mDrawerList.setAdapter( drawerBoardsListAdapter);
 
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-
-
-
 
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,                  /* host Activity */
@@ -193,8 +212,8 @@ public class MainActivityDrawer extends Activity {
     }
 
 
-    /**Browse all sharedPreferences to find which boards are enabled*/
-    public ArrayList getEnabledBoardsNames(){
+    /**Browse all sharedPreferences to find which boards are enabled, should be used one time, at first launch*/
+    public ArrayList refreshEnabledBoardsNames(){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
         ArrayList boardNamesArray = new ArrayList();
@@ -212,16 +231,35 @@ public class MainActivityDrawer extends Activity {
             }
         }
 
-  /*      Set<String> set = new HashSet<String>();
-        set.addAll( boardNamesArray);
+        //Store the enabled boards in preferences
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putStringSet( "enabled_boards", set);
-        editor.commit();
-*/
+        editor.putInt( "boards_enabled_size", boardNamesArray.size());
+        int size = boardNamesArray.size();
 
+        if( size > 0){
+            for( int i = 0; i < size; i++){
+                editor.putString( "boards_enabled_" + i, (String)boardNamesArray.get( i) );
+                if( debug)
+                    Log.d( TAG, "New board settings wrote to prefs: " + i + " " + (String)boardNamesArray.get( i));
+            }
+            editor.commit();
+        }
     return boardNamesArray;
     }
 
+
+    private ArrayList  readBoardsListFromPreferences(){
+
+        ArrayList list = new ArrayList();
+        int size = prefs.getInt( "boards_enabled_size", 0);
+
+        for( int i =0; i < size; i++){
+            Log.d( TAG, "Read Board["+i+"] >> " + prefs.getString( "boards_enabled_" + i, "empty"));
+            list.add( prefs.getString( "boards_enabled_" + i, "empty"));
+        }
+
+    return list;
+    }
 
 
 
