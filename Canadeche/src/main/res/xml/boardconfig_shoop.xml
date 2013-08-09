@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                      android:title="shoop">
+<PreferenceCategory
+            android:title="@string/pref_category_board_general">
+
+    <CheckBoxPreference
+            android:key="boardconfig_shoop_checkbox_boardenabled"
+            android:title="@string/pref_board_enabled_title"
+            android:summary="@string/pref_boardsenabled_summary" />
+
+    <CheckBoxPreference
+            android:key="boardconfig_shoop_checkbox_quietboard"
+            android:title="@string/pref_board_quiet_title"
+            android:summary="@string/pref_quietboard_summary"
+            android:defaultValue="false" />
+
+    <EditTextPreference
+            android:key="boardconfig_shoop_edittext_boardname"
+            android:title="@string/pref_board_name_title"
+            android:summary="@string/pref_board_name_summary"
+            android:dialogTitle="@string/pref_board_name_dialogtitle" />
+
+    <EditTextPreference
+            android:key="boardconfig_shoop_edittext_boardalias"
+            android:title="@string/pref_board_alias_title"
+            android:summary="@string/pref_board_alias_summary"
+            android:dialogTitle="@string/pref_board_alias_dialogtitle" />
+
+</PreferenceCategory>
+
+<PreferenceCategory
+            android:title="@string/pref_category_board_authentication">
+
+    <EditTextPreference
+            android:key="boardconfig_shoop_edittext_boardlogin"
+            android:title="@string/pref_board_login_title"
+            android:summary="@string/pref_board_login_summary"
+            android:dialogTitle="@string/pref_board_login_dialogtitle" />
+
+    <EditTextPreference
+            android:key="boardconfig_shoop_edittext_boardua"
+            android:title="@string/pref_board_ua_title"
+            android:summary="@string/pref_board_ua_summary"
+            android:dialogTitle="@string/pref_board_ua_dialogtitle" />
+
+    <EditTextPreference
+            android:key="boardconfig_shoop_edittext_boardcookie"
+            android:title="@string/pref_board_cookie_title"
+            android:summary="@string/pref_board_cookie_summary"
+            android:dialogTitle="@string/pref_board_cookie_dialogtitle" />
+</PreferenceCategory>
+
+<PreferenceCategory
+            android:title="@string/pref_category_board_backend">
+
+    <EditTextPreference
+            android:key="boardconfig_shoop_edittext_host"
+            android:title="@string/pref_board_host_title"
+            android:summary="@string/pref_board_host_summary"
+            android:defaultValue="tout.essaye.sauf.ca" />
+
+    <EditTextPreference
+            android:key="boardconfig_shoop_edittext_boardslipurl"
+            android:title="@string/pref_board_slipsurl_title"
+            android:summary="@string/pref_board_slipsurl_summary"
+            android:dialogTitle="@string/pref_board_slipsurl_dialogtitle"
+            android:defaultValue="http://dax.sveetch.net/tribune/remote.xml"
+            />
+
+    <EditTextPreference
+            android:key="boardconfig_shoop_edittext_boardposturl"
+            android:title="@string/pref_board_posturl_title"
+            android:summary="@string/pref_board_postsurl_summary"
+            android:dialogTitle="@string/pref_board_postsurl_dialogtitle"
+            android:defaultValue="http://dax.sveetch.net/tribune/post.xml" />
+
+
+    <CheckBoxPreference
+            android:key="boardconfig_shoop_checkbox_boardtagsencoded"
+            android:title="@string/pref_board_tagsencoded_title"
+            android:summary="@string/pref_board_tagsencoded_summary"
+            android:defaultValue="true" />
+    />
+</PreferenceCategory>
+
+    </PreferenceScreen>
+</PreferenceScreen>

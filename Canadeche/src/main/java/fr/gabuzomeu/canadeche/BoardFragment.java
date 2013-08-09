@@ -258,8 +258,10 @@ public class BoardFragment extends Fragment {
     }
 
     protected void onPostExecute(Bitmap result) {
-        bmImage.setImageBitmap(result);
-        }
+
+        bmImage.setImageBitmap( result);
+
+    }
     };
 
 }
