@@ -41,9 +41,14 @@
 
     </PreferenceCategory>
 
+    <Preference android:title="@string/reorder_boards"
+                android:key="reorder_boards"
+                android:summary="@string/reorder_boards_summary"/>
+
     <PreferenceCategory
             android:title="@string/boards_list">
     </PreferenceCategory>
 
 
-    </PreferenceScreen>
+
+</PreferenceScreen>

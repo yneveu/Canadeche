@@ -30,12 +30,25 @@
                 android:numeric="integer"
                 />
 
+        <EditTextPreference
+                android:key="pref_max_post_displayed"
+                android:summary="@string/pref_max_post_displayed_summary"
+                android:title="@string/pref_max_post_displayed_title"
+                android:defaultValue="100"
+                android:numeric="integer"
+                />
+
 
     </PreferenceCategory>
+
+    <Preference android:title="@string/reorder_boards"
+                android:key="reorder_boards"
+                android:summary="@string/reorder_boards_summary"/>
 
     <PreferenceCategory
             android:title="@string/boards_list">
     </PreferenceCategory>
 
 
-    </PreferenceScreen><!-- From: file:/home/yann/AndroidStudioProjects/Canadeche/Canadeche/src/main/res/xml/preferences.xml -->
+
+</PreferenceScreen><!-- From: file:/home/yann/AndroidStudioProjects/Canadeche/Canadeche/src/main/res/xml/preferences.xml -->

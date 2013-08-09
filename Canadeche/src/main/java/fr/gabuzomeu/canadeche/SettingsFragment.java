@@ -3,6 +3,7 @@ package fr.gabuzomeu.canadeche;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -23,10 +24,15 @@ import fr.gabuzomeu.canadeche.authenticators.DlfpAuthenticator;
 public class SettingsFragment extends PreferenceFragment {
 
     private static String TAG = "CanadecheSettingsFragment";
+    private boolean debug = false;
+    private SharedPreferences prefs;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        prefs = PreferenceManager.getDefaultSharedPreferences( getActivity());
+        debug = prefs.getBoolean("pref_debug", false);
 
         // Load the preferences from an XML resource
         addPreferencesFromResource( R.xml.preferences);
@@ -41,6 +47,15 @@ public class SettingsFragment extends PreferenceFragment {
             public boolean onPreferenceClick(Preference arg0) {
             AlertDialog dial = loginDialog( getActivity(), "Log DLFP");
             dial.show();
+                return true;
+            }
+        });
+
+        Preference buttonReorder = (Preference)findPreference("reorder_boards");
+        buttonReorder.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference arg0) {
+                startActivity( new Intent( getActivity(), ReorderBoardsActivity.class));
                 return true;
             }
         });
