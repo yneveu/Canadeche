@@ -68,6 +68,11 @@ public class MainActivityDrawer extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
        super.onCreate(savedInstanceState);
 
+
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
+
         PreferenceManager.setDefaultValues( this, R.xml.boardconfig_linuxfr, false);
         PreferenceManager.setDefaultValues( this, R.xml.boardconfig_gabuzomeu, false);
         PreferenceManager.setDefaultValues( this, R.xml.boardconfig_euromussels, false);
@@ -116,6 +121,20 @@ public class MainActivityDrawer extends Activity {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
 
+        if( debug){
+            Log.d(TAG, "Received Intent: Action: " + action + " type: " + type );
+        }
+        if (Intent.ACTION_SEND.equals( intent.getAction()) && intent.getType() != null) {
+            if ("text/plain".equals( intent.getType())) {
+                if( debug)
+                    Log.d( TAG, "Received intent text/plain : " + intent.getStringExtra( Intent.EXTRA_TEXT));
+                Log.d( TAG, "On choisit linuxfr");
+             //   selectItem( 0, "linuxfr");
+
+            }
+
+        }
+
         setContentView(R.layout.activity_main_drawer);
 
         mTitle = mDrawerTitle = getTitle();
@@ -132,8 +151,10 @@ public class MainActivityDrawer extends Activity {
 
         drawerBoardsListAdapter = new ArrayAdapter<String>(this, R.layout.drawer_list_item, enabledBoardsNameList);
         mDrawerList.setAdapter( drawerBoardsListAdapter);
-
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+
+
 
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,                  /* host Activity */
@@ -161,12 +182,16 @@ public class MainActivityDrawer extends Activity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
+
+
+
     }
 
 
     @Override
     protected void onNewIntent(Intent intent)
     {
+
         super.onNewIntent(intent);
         if( intent.getScheme() != null){
             if( intent.getScheme().compareTo( "totoz") == 0){
@@ -177,9 +202,10 @@ public class MainActivityDrawer extends Activity {
                 currentFragment.displayTotoz( totoz );
             }
         }
+
+
+
     }
-
-
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

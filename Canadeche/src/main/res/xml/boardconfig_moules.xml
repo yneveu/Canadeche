@@ -68,7 +68,7 @@
             android:title="@string/pref_board_slipsurl_title"
             android:summary="@string/pref_board_slipsurl_summary"
             android:dialogTitle="@string/pref_board_slipsurl_dialogtitle"
-            android:defaultValue="http://dax.sveetch.net/tribune/remote.xml"
+            android:defaultValue="http://moules.org/board/backend"
             />
 
     <EditTextPreference
