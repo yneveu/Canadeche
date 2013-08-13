@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.FragmentManager;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,18 +12,24 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.os.Bundle;
-import android.os.IBinder;
-import android.os.StrictMode;
+import android.database.Cursor;
+import android.graphics.Point;
+import android.net.Uri;
+import android.os.*;
+import android.os.Message;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Surface;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -32,12 +39,27 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
+import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import fr.gabuzomeu.canadeche.CustomMultiPartEntity;
 
 public class MainActivityDrawer extends Activity {
 
@@ -68,12 +90,23 @@ public class MainActivityDrawer extends Activity {
 
     private boolean calledForSharing = false;
 
+
+    private final Handler mHandler = new Handler() {
+        @Override public void handleMessage(android.os.Message msg) {
+            ArrayList returnMessage = (ArrayList)msg.obj;
+            String boardName = (String)returnMessage.get( 0);
+            int position = Integer.parseInt((String) returnMessage.get(1));
+            String url = (String)returnMessage.get( 2);
+            selectItem( position, boardName, url);
+        };
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
        super.onCreate(savedInstanceState);
 
 
-        Intent intent = getIntent();
+        final Intent intent = getIntent();
         String action = intent.getAction();
         String type = intent.getType();
 
@@ -83,6 +116,7 @@ public class MainActivityDrawer extends Activity {
         PreferenceManager.setDefaultValues( this, R.xml.boardconfig_see, false);
         PreferenceManager.setDefaultValues( this, R.xml.preferences, false);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
 
 
         debug = prefs.getBoolean("pref_debug", false);
@@ -175,6 +209,9 @@ public class MainActivityDrawer extends Activity {
         StrictMode.setThreadPolicy(policy);
         //
 
+
+
+
         if( debug){
             Log.d(TAG, "Received Intent: Action: " + action + " type: " + type );
         }
@@ -208,22 +245,45 @@ public class MainActivityDrawer extends Activity {
                 });
 
                 dialog.show();
+            }
+            else{
+                Log.d( TAG, "Upload file " + intent.getType());
 
+//Todo: Handle orientation changes
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Select board for sharing");
 
+                final ListView boardListView = new ListView(this);
+                ArrayAdapter<String> boardListAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, enabledBoardsNameList);
+                boardListView.setAdapter( boardListAdapter);
 
+                builder.setView( boardListView);
+                final Dialog dialog = builder.create();
 
-                Log.d( TAG, "On choisit linuxfr");
+                boardListView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
+                        String boardName = (String)boardListView.getItemAtPosition( position);
+                        Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+                        if (imageUri != null) {
+                            String filePath = convertMediaUriToPath( imageUri);
+                            if( debug)
+                                Log.d("TAG", "in handleUploadFile: " + imageUri + " --> " + filePath);
+                            HttpMultipartPost task = new HttpMultipartPost();
+                            task.execute( filePath, boardName, String.valueOf( position));
+                         }
+                         dialog.dismiss();
 
-                //selectItem( 0, "linuxfr");
+                    }
+                });
+
+                dialog.show();
 
             }
 
         }
 
-
-
     }
-
 
     @Override
     protected void onNewIntent(Intent intent)
@@ -434,4 +494,112 @@ public class MainActivityDrawer extends Activity {
     protected void onPause() {
         super.onPause();
     }
+
+
+    private class HttpMultipartPost extends AsyncTask< String, Integer, String>
+    {
+        ProgressDialog pd;
+        long totalSize;
+
+        String boardName;
+        String boardPosition;
+
+        @Override
+        protected void onPreExecute()
+        {
+            pd = new ProgressDialog( MainActivityDrawer.this);
+            pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            pd.setMessage("Uploading Picture...");
+            pd.setCancelable( true);
+            pd.show();
+        }
+
+        @Override
+        protected String doInBackground( String... arg0)
+        {
+            boardName = arg0[1];
+            boardPosition = arg0[2];
+
+            HttpClient httpClient = new DefaultHttpClient();
+            HttpContext httpContext = new BasicHttpContext();
+            HttpPost httpPost = new HttpPost("http://plop.cc/attach.php");
+
+            try
+            {
+                CustomMultiPartEntity multipartContent;
+
+                multipartContent = new CustomMultiPartEntity(new CustomMultiPartEntity.ProgressListener()
+                {
+                    @Override
+                    public void transferred(long num)
+                    {
+                        publishProgress((int) ((num / (float) totalSize) * 100));
+                    }
+                });
+
+                // We use FileBody to transfer an image
+                multipartContent.addPart("attach_file", new FileBody(new File(arg0[0])));
+                totalSize = multipartContent.getContentLength();
+
+                // Send it
+                httpPost.setEntity( multipartContent);
+                HttpResponse response = httpClient.execute(httpPost, httpContext);
+                String serverResponse = EntityUtils.toString(response.getEntity());
+                if( debug)
+                    Log.d(TAG, "Server Response -- > " + serverResponse);
+                Pattern pattern = Pattern.compile( ",\\ \"(.*)\"");
+                Matcher matcher = pattern.matcher( serverResponse);
+                String url = "";
+                if( matcher.find()){
+                    url = matcher.group(1);
+                }
+                if( debug)
+                    Log.d( TAG, "URLLLLLLLLLLLLLLLLL->" + url);
+
+                return url;
+            }
+
+            catch (Exception e)
+            {
+                System.out.println(e);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... progress)
+        {
+            pd.setProgress((int) (progress[0]));
+        }
+
+        @Override
+        protected void onPostExecute(String ui){
+            Toast.makeText( MainActivityDrawer.this, "PostExecute: " + ui, Toast.LENGTH_SHORT).show();
+            ArrayList messageContent = new ArrayList();
+            messageContent.add( 0, boardName);
+            messageContent.add( 1, String.valueOf( boardPosition));
+            messageContent.add( 2, ui);
+            android.os.Message msg = new Message();
+            msg.obj = messageContent;
+            mHandler.dispatchMessage( msg);
+            pd.dismiss();
+        }
+    }
+
+
+
+    protected String convertMediaUriToPath(Uri uri) {
+        String [] proj={ MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(uri, proj,  null, null, null);
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String path = cursor.getString(column_index);
+        cursor.close();
+        return path;
+    }
+
+
+
+
+
 }
