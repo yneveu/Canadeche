@@ -1,6 +1,8 @@
 package fr.gabuzomeu.canadeche;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -39,7 +41,7 @@ import java.util.StringTokenizer;
 
 public class MainActivityDrawer extends Activity {
 
-    public static String TAG = "Canadeche MainActivity";
+    public static String TAG = "Canadeche MainActivityDrawer";
     ViewPager mViewPager;
     Boolean debug = false;
     private boolean mIsBound;
@@ -63,6 +65,8 @@ public class MainActivityDrawer extends Activity {
     private CharSequence mTitle;
 
     BoardFragment currentFragment;
+
+    private boolean calledForSharing = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,19 +125,7 @@ public class MainActivityDrawer extends Activity {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
 
-        if( debug){
-            Log.d(TAG, "Received Intent: Action: " + action + " type: " + type );
-        }
-        if (Intent.ACTION_SEND.equals( intent.getAction()) && intent.getType() != null) {
-            if ("text/plain".equals( intent.getType())) {
-                if( debug)
-                    Log.d( TAG, "Received intent text/plain : " + intent.getStringExtra( Intent.EXTRA_TEXT));
-                Log.d( TAG, "On choisit linuxfr");
-             //   selectItem( 0, "linuxfr");
 
-            }
-
-        }
 
         setContentView(R.layout.activity_main_drawer);
 
@@ -174,14 +166,59 @@ public class MainActivityDrawer extends Activity {
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
         };
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
+        mDrawerLayout.setDrawerListener( mDrawerToggle);
+        getActionBar().setDisplayHomeAsUpEnabled( true);
+        getActionBar().setHomeButtonEnabled( true);
 
         /**Todo Remove that*/
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+        //
 
+        if( debug){
+            Log.d(TAG, "Received Intent: Action: " + action + " type: " + type );
+        }
+        if (Intent.ACTION_SEND.equals( intent.getAction()) && intent.getType() != null) {
+
+            calledForSharing = true;
+
+            if ("text/plain".equals( intent.getType())) {
+                final String sentText = intent.getStringExtra( Intent.EXTRA_TEXT);
+                if( debug)
+                    Log.d( TAG, "Received intent text/plain : " + sentText);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Select board for sharing");
+
+                final ListView boardListView = new ListView(this);
+                ArrayAdapter<String> boardListAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, enabledBoardsNameList);
+                boardListView.setAdapter( boardListAdapter);
+
+                builder.setView( boardListView);
+                final Dialog dialog = builder.create();
+
+                boardListView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
+                        String boardName = (String)boardListView.getItemAtPosition( position);
+                        selectItem( position, boardName, sentText);
+                        Toast.makeText( getApplicationContext(), "You selected : " + boardName,Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+                });
+
+                dialog.show();
+
+
+
+
+                Log.d( TAG, "On choisit linuxfr");
+
+                //selectItem( 0, "linuxfr");
+
+            }
+
+        }
 
 
 
@@ -210,12 +247,17 @@ public class MainActivityDrawer extends Activity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             TextView tv= (TextView)view.findViewById( R.id.drawer_element_textview);
-            selectItem(position, tv.getText().toString());
+            selectItem( position, tv.getText().toString(), null);
         }
     }
 
-    private void selectItem(int position, String boardName) {
-        currentFragment = new BoardFragment( mBoundService);
+    //prepMessage cand be used to prefill post filed
+    private void selectItem(int position, String boardName, String prepMessage) {
+        if( debug){
+            Log.d(TAG, "selectItem() : " + position + " " + boardName);
+        }
+
+        currentFragment = new BoardFragment( mBoundService, prepMessage);
         Bundle args = new Bundle();
         args.putInt( BoardFragment.ARG_SECTION_NUMBER, position);
         args.putString(BoardFragment.ARG_SECTION_ID, boardName);
@@ -224,7 +266,7 @@ public class MainActivityDrawer extends Activity {
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_frame, currentFragment).commit();
 
-        mDrawerList.setItemChecked(position, true);
+        mDrawerList.setItemChecked( position, true);
         getActionBar().setTitle( (String)enabledBoardsNameList.get( position));
         mDrawerLayout.closeDrawer(mDrawerList);
     }
@@ -317,7 +359,9 @@ public class MainActivityDrawer extends Activity {
             if( debug)
                 Toast.makeText( MainActivityDrawer.this, R.string.local_service_connected, Toast.LENGTH_SHORT).show();
             mBoundService.plop();
-            selectItem( 0, (String)enabledBoardsNameList.get( 0));
+            if( !calledForSharing)
+                selectItem( 0, (String)enabledBoardsNameList.get( 0), null);
+            calledForSharing = false;
         }
 
         public void onServiceDisconnected(ComponentName className) {
