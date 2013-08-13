@@ -55,12 +55,17 @@ public class BoardFragment extends Fragment {
         List<Message> messages;
         String boardName;
 
+        String prepopulatedMessage = "";
+
     public BoardFragment( ) {
 
         }
 
-        public BoardFragment( CanadecheService service) {
+        public BoardFragment( CanadecheService service, String prepMessage) {
             mBoundService = service;
+            if( prepMessage != null){
+                prepopulatedMessage = prepMessage;
+            }
             Log.d( TAG, "mBoundService " + mBoundService);
         }
 
@@ -148,6 +153,12 @@ public class BoardFragment extends Fragment {
             messagesListView = (ListView)rootView.findViewById( R.id.messagesListView);
             messagesListView.setAdapter( adapter);
             //adaptersList.add( adapter);
+
+            if( prepopulatedMessage.length() > 0){
+                EditText et = (EditText)rootView.findViewById( R.id.message);
+                et.setText( prepopulatedMessage);
+                et.requestFocus();
+            }
             return rootView;
         }
 
@@ -232,10 +243,6 @@ public class BoardFragment extends Fragment {
                 return false;
             }
         }
-
-
-
-
 
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         ImageView bmImage;
