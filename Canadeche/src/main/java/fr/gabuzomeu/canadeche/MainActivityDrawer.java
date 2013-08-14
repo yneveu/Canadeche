@@ -589,11 +589,22 @@ public class MainActivityDrawer extends Activity {
 
 
     protected String convertMediaUriToPath(Uri uri) {
+
+        String path = uri.toString();
+
         String [] proj={ MediaStore.Images.Media.DATA};
+        if( debug)
+            Log.d(TAG, "Trying to convert: " + uri);
+
+        if( uri.toString().startsWith( "file://")){
+            path = uri.toString().substring(7);
+            return path;
+        }
+
         Cursor cursor = getContentResolver().query(uri, proj,  null, null, null);
         int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
         cursor.moveToFirst();
-        String path = cursor.getString(column_index);
+        path = cursor.getString(column_index);
         cursor.close();
         return path;
     }

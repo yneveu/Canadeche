@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -86,12 +88,15 @@ public class BoardFragment extends Fragment {
 
 
             View layout = inflater.inflate(R.layout.totoz_popup, null);
-            ImageView image = (ImageView) layout.findViewById(R.id.fullimage);
-
-            new DownloadImageTask( image).execute("http://totoz.eu/img/" + _totoz);
-            imageDialog.setTitle( "[:" + _totoz + "]" );
-            imageDialog.setView( layout);
+            WebView wView = (WebView) layout.findViewById( R.id.webView);
+            wView.getSettings().setBuiltInZoomControls(true);
+            //wView.getSettings().setDefaultZoom( WebSettings.ZoomDensity.FAR);
+            wView.loadData("<html><head><style type='text/css'>body{margin:auto auto;text-align:center;} img{width:50%25;} </style></head><body><img src='" + "http://totoz.eu/img/" + _totoz +"'/></body></html>" ,"text/html",  "UTF-8");
+            imageDialog.setTitle("[:" + _totoz + "]");
+            imageDialog.setView(layout);
             imageDialog.setPositiveButton( R.string.ok_button, new DialogInterface.OnClickListener(){
+
+
 
                 public void onClick(DialogInterface dialog, int which) {
             dialog.dismiss();
@@ -244,32 +249,7 @@ public class BoardFragment extends Fragment {
             }
         }
 
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView bmImage;
 
-    public DownloadImageTask(ImageView bmImage) {
-        this.bmImage = bmImage;
-    }
-
-    protected Bitmap doInBackground(String... urls) {
-        String urldisplay = urls[0];
-        Bitmap mIcon11 = null;
-        try {
-            InputStream in = new java.net.URL(urldisplay).openStream();
-            mIcon11 = BitmapFactory.decodeStream(in);
-        } catch (Exception e) {
-            Log.e("Error", e.getMessage());
-            e.printStackTrace();
-        }
-        return mIcon11;
-    }
-
-    protected void onPostExecute(Bitmap result) {
-
-        bmImage.setImageBitmap( result);
-
-    }
-    };
 
 }
 
