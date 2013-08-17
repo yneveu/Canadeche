@@ -212,9 +212,9 @@ public class BoardFragment extends Fragment {
         }
 
 
-        public void displaySearchBar(){
+        public void displaySearchBar( String filter){
 
-            if( filterEditText.isShown()){
+            if( filterEditText.isShown() && filter == null){
                 filterEditText.setVisibility( View.GONE);
                 filterFieldClear.setVisibility( View.GONE);
             }
@@ -223,12 +223,22 @@ public class BoardFragment extends Fragment {
                 filterFieldClear.setVisibility( View.VISIBLE);
                 InputMethodManager mgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                 filterEditText.requestFocus();
-                mgr.showSoftInput( filterEditText, InputMethodManager.SHOW_IMPLICIT);
+                if( filter == null )
+                    mgr.showSoftInput( filterEditText, InputMethodManager.SHOW_IMPLICIT);
+                else{
+                    filterEditText.setText( filter);
+                    adapter.getFilter().filter( filter);
+
+                }
 
             }
 
         }
 
+
+        public void filterOn( String filterString){
+            adapter.getFilter().filter( filterString);
+        }
 
         /**TODO Use asynctask to post and remove policy things*/
         private boolean postMessage( String board, String message){

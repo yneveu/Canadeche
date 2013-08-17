@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Filter;
@@ -144,7 +145,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements Filterable 
 
         Spanned span = Html.fromHtml(transformedMessage);
         post.setText( span);
-        Linkify.addLinks( post, Linkify.ALL);
+        Linkify.addLinks( post, Linkify.WEB_URLS);
 
         //Totoz
         Pattern pattern = Pattern.compile("\\[:(.*)\\]");
@@ -154,13 +155,27 @@ public class MessageAdapter extends ArrayAdapter<Message> implements Filterable 
         //Norloges
         Pattern norlogesPattern = Pattern.compile("((?:1[0-2]|0[1-9])/(?:3[0-1]|[1-2][0-9]|0[1-9])#)?((?:2[0-3]|[0-1][0-9])):([0-5][0-9])(:[0-5][0-9])?([¹²³]|[:\\^][1-9]|[:\\^][1-9][0-9])?(@[A-Za-z0-9_]+)?");
         Matcher matcher =  norlogesPattern.matcher( post.getText() );
-        if( matcher.find()){
-            if( debug)
-                Log.d( TAG, "Norloge trouvée, count: " + matcher.groupCount() + " "  + matcher.group( 2) );
+        scheme = "norloge://";
+        Linkify.addLinks( post, norlogesPattern, scheme);
+
+        if( message.getInFilter()){
+            post.setBackgroundColor( Color.YELLOW);
+            norloge.setBackgroundColor( Color.YELLOW);
+            login.setBackgroundColor( Color.YELLOW);
+            v.setBackgroundColor( Color.YELLOW);
+            v.findViewById(R.id.infos).setBackgroundColor( Color.YELLOW);
+            v.findViewById(R.id.message).setBackgroundColor( Color.YELLOW);
+
+
+        }else{
+            post.setBackgroundColor( Color.WHITE);
+            norloge.setBackgroundColor( Color.WHITE);
+            login.setBackgroundColor( Color.WHITE);
+            v.setBackgroundColor( Color.WHITE);
+            v.findViewById(R.id.infos).setBackgroundColor( Color.WHITE);
+            v.findViewById(R.id.message).setBackgroundColor( Color.WHITE);
 
         }
-
-
 
         return v;
 
@@ -185,8 +200,16 @@ public class MessageAdapter extends ArrayAdapter<Message> implements Filterable 
 
             if (constraint == null || constraint.length() == 0) {
                 // No filter implemented we return all the list
+                for ( Message m : fullMessageList) {
+                    if( m.getInFilter()){
+                        m.setInFilter( false);
+                        Log.d( TAG, "Invalidate filter on " + m.getMessage());
+                    }
+
+                }
                 results.values = fullMessageList;
                 results.count = fullMessageList.size();
+
             }else{
                 List<Message> filteredMessagesList = new ArrayList<Message>();
                 for ( Message m : fullMessageList) {
@@ -197,12 +220,16 @@ public class MessageAdapter extends ArrayAdapter<Message> implements Filterable 
                     final String seconds=sClock.substring( 12,14);
                     String cNorloge =  hour + ":" + minutes + ":" + seconds;
 
+                    filteredMessagesList.add( m);
+
                     if( m.getMessage().toLowerCase().contains( constraint.toString().toLowerCase()) ||
                         m.getInfo().toLowerCase().contains( constraint.toString().toLowerCase()) ||
                         m.getLogin() != null && m.getLogin().toLowerCase().contains( constraint.toString().toLowerCase()) ||
                         cNorloge.contains( constraint)
-                        )
-                        filteredMessagesList.add( m);
+                        ){
+                        m.setInFilter( true);
+
+                    }
                 }
                 results.values = filteredMessagesList;
                 results.count = filteredMessagesList.size();
