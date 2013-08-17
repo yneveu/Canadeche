@@ -11,6 +11,18 @@ public class Message implements Comparable {
     private String login;
     private String backgroundColor;
 
+    private boolean inFilter = false;
+
+
+    public boolean getInFilter(){
+        return inFilter;
+    }
+
+    public void setInFilter( boolean  mBool){
+        inFilter = mBool;
+    }
+
+
     public String getBoard() {
         return board;
     }

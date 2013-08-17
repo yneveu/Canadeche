@@ -291,7 +291,15 @@ public class MainActivityDrawer extends Activity {
                 if( debug)
                     Toast.makeText( getApplicationContext(), "Totoz received: " + totoz, Toast.LENGTH_SHORT).show();
                 currentFragment.displayTotoz( totoz );
+            }else if ( intent.getScheme().compareTo( "norloge") == 0){
+                String norloge = intent.getDataString();
+                norloge = norloge.substring( 10, norloge.length());
+                if( debug)
+                    Toast.makeText( getApplicationContext(), "Norloge received: " + norloge, Toast.LENGTH_SHORT).show();
+                currentFragment.filterOn( null);
+                currentFragment.displaySearchBar( norloge);
             }
+
         }
 
 
@@ -397,7 +405,7 @@ public class MainActivityDrawer extends Activity {
                 mBoundService.refresh( currentFragment.getBoardName() );
                 return true;
             case R.id.action_search:
-                currentFragment.displaySearchBar();
+                currentFragment.displaySearchBar( null);
                 return true;
             case R.id.action_settings:
                 Intent intent = new Intent(this, SettingsActivity.class);
