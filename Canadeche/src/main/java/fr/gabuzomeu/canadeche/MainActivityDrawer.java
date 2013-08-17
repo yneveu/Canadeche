@@ -12,13 +12,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.graphics.Point;
 import android.net.Uri;
-import android.os.*;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -26,10 +28,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
-import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Surface;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -50,16 +50,10 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
 import java.util.StringTokenizer;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import fr.gabuzomeu.canadeche.CustomMultiPartEntity;
 
 public class MainActivityDrawer extends Activity {
 
@@ -399,6 +393,12 @@ public class MainActivityDrawer extends Activity {
         }
 
         switch(item.getItemId()) {
+            case R.id.action_refresh:
+                mBoundService.refresh( currentFragment.getBoardName() );
+                return true;
+            case R.id.action_search:
+                currentFragment.displaySearchBar();
+                return true;
             case R.id.action_settings:
                 Intent intent = new Intent(this, SettingsActivity.class);
                 this.startActivity(intent);

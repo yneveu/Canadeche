@@ -2,24 +2,22 @@ package fr.gabuzomeu.canadeche;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebSettings;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -33,7 +31,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,8 +43,10 @@ public class BoardFragment extends Fragment {
         public static final String ARG_SECTION_NUMBER = "section_number";
         public static final String ARG_SECTION_ID = "section_id";
         public CanadecheService mBoundService = null;
-        Button refreshButton;
         Button postButton;
+        EditText filterEditText;
+        Button filterFieldClear;
+
         MessagesDataSource mds;
         ArrayAdapter<Message> adapter;
 
@@ -121,15 +120,6 @@ public class BoardFragment extends Fragment {
             //    TextView dummyTextView = (TextView) rootView.findViewById(R.id.section_label);
             //  dummyTextView.setText("PLOP " + Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
 
-            refreshButton =(Button)rootView.findViewById( R.id.refreshButton);
-            refreshButton.setOnClickListener( new View.OnClickListener(){
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(getActivity(), getArguments().getString(ARG_SECTION_ID), Toast.LENGTH_SHORT).show();
-                    mBoundService.refresh( getArguments().getString(ARG_SECTION_ID ));
-                    refreshContent();
-                }
-            });
 
             postButton =(Button)rootView.findViewById( R.id.postButton);
             postButton.setOnClickListener( new View.OnClickListener(){
@@ -164,6 +154,38 @@ public class BoardFragment extends Fragment {
                 et.setText( prepopulatedMessage);
                 et.requestFocus();
             }
+
+
+            filterEditText = (EditText)rootView.findViewById( R.id.filterField);
+            filterEditText.addTextChangedListener(new TextWatcher() {
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    System.out.println("Text ["+s+"]");
+                    adapter.getFilter().filter(s.toString());
+                }
+
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count,
+                                              int after) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                }
+            });
+
+
+            filterFieldClear = (Button)rootView.findViewById( R.id.clearFilterButton);
+            filterFieldClear.setOnClickListener( new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    filterEditText.setText("");
+                    adapter.getFilter().filter( null);
+                }
+            });
+
             return rootView;
         }
 
@@ -182,10 +204,29 @@ public class BoardFragment extends Fragment {
 
         public void refreshContent(){
             Log.d(TAG, "adapter " + adapter);
+
             mds.open();
             messages.clear();
             messages.addAll(mds.getAllMessages(boardName));
             adapter.notifyDataSetChanged();
+        }
+
+
+        public void displaySearchBar(){
+
+            if( filterEditText.isShown()){
+                filterEditText.setVisibility( View.GONE);
+                filterFieldClear.setVisibility( View.GONE);
+            }
+            else{
+                filterEditText.setVisibility( View.VISIBLE);
+                filterFieldClear.setVisibility( View.VISIBLE);
+                InputMethodManager mgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                filterEditText.requestFocus();
+                mgr.showSoftInput( filterEditText, InputMethodManager.SHOW_IMPLICIT);
+
+            }
+
         }
 
 
@@ -248,6 +289,10 @@ public class BoardFragment extends Fragment {
                 return false;
             }
         }
+
+
+
+
 
 
 

@@ -1,16 +1,15 @@
 package fr.gabuzomeu.canadeche;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.util.Log;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.util.Log;
+import java.util.ArrayList;
 
 public class BoardParser extends DefaultHandler {
 

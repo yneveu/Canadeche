@@ -1,11 +1,6 @@
 package fr.gabuzomeu.canadeche;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -20,18 +15,29 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.LinearLayout;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class MessageAdapter extends ArrayAdapter<Message> {
+
+public class MessageAdapter extends ArrayAdapter<Message> implements Filterable {
 
     private Context context;
     private List<Message> messagesList;
+    //non filtered list
+    private List<Message> fullMessageList;
     String boardName;
     private SharedPreferences prefs;
     boolean debug = false;
     EditText ed;
+
+    private NorlogeFilter norlogeFilter;
+
     public static String TAG = "CanadecheMessageAdapter";
 
 
@@ -41,6 +47,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         prefs = PreferenceManager.getDefaultSharedPreferences( context);
         debug = prefs.getBoolean("pref_debug", false);
         this.messagesList = messagesList;
+        this.fullMessageList = messagesList;
         boardName = _boardName;
         ed = _ed;
 
@@ -144,10 +151,77 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         String scheme = "totoz://";
         Linkify.addLinks( post, pattern, scheme);
 
+        //Norloges
+        Pattern norlogesPattern = Pattern.compile("((?:1[0-2]|0[1-9])/(?:3[0-1]|[1-2][0-9]|0[1-9])#)?((?:2[0-3]|[0-1][0-9])):([0-5][0-9])(:[0-5][0-9])?([¹²³]|[:\\^][1-9]|[:\\^][1-9][0-9])?(@[A-Za-z0-9_]+)?");
+        Matcher matcher =  norlogesPattern.matcher( post.getText() );
+        if( matcher.find()){
+            if( debug)
+                Log.d( TAG, "Norloge trouvée, count: " + matcher.groupCount() + " "  + matcher.group( 2) );
+
+        }
+
+
 
         return v;
 
 
     }
+
+    /**Norloges filtering*/
+    @Override
+    public Filter getFilter() {
+        if ( norlogeFilter == null)
+            norlogeFilter = new NorlogeFilter();
+
+        return norlogeFilter;
+    }
+
+    private class NorlogeFilter extends Filter {
+
+        @Override
+        protected FilterResults performFiltering( CharSequence constraint) {
+
+            FilterResults results = new FilterResults();
+
+            if (constraint == null || constraint.length() == 0) {
+                // No filter implemented we return all the list
+                results.values = fullMessageList;
+                results.count = fullMessageList.size();
+            }else{
+                List<Message> filteredMessagesList = new ArrayList<Message>();
+                for ( Message m : fullMessageList) {
+
+                    String sClock= String.valueOf( m.getTime());
+                    final String hour=sClock.substring( 8, 10);
+                    final String minutes=sClock.substring(10,12);
+                    final String seconds=sClock.substring( 12,14);
+                    String cNorloge =  hour + ":" + minutes + ":" + seconds;
+
+                    if( m.getMessage().toLowerCase().contains( constraint.toString().toLowerCase()) ||
+                        m.getInfo().toLowerCase().contains( constraint.toString().toLowerCase()) ||
+                        m.getLogin() != null && m.getLogin().toLowerCase().contains( constraint.toString().toLowerCase()) ||
+                        cNorloge.contains( constraint)
+                        )
+                        filteredMessagesList.add( m);
+                }
+                results.values = filteredMessagesList;
+                results.count = filteredMessagesList.size();
+            }
+
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            if (results.count == 0)
+                notifyDataSetInvalidated();
+            else {
+                messagesList = (List<Message>) results.values;
+                notifyDataSetChanged();
+            }
+        }
+    }
+
+
 
 }

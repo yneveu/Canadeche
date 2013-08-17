@@ -65,5 +65,7 @@
     <string name="reorder_boards_summary">Change the boards\' tab order</string>
     <string name="title_activity_reorder_boards">\@strings/reorder_boards</string>
     <string name="hello_world">Hello world!</string>
+    <string name="action_search">Search</string>
+    <string name="action_refresh">Refresh</string>
 
 </resources>

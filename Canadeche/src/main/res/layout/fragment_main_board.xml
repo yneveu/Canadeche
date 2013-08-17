@@ -5,6 +5,14 @@
 
     tools:context=".MainActivity$BoardSectionFragment">
 
+    <EditText
+            android:id="@+id/filterField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:maxLines="1"
+            android:visibility="gone"
+            android:layout_toLeftOf="@+id/clearFilterButton"/>
 
     <EditText
             android:layout_width="wrap_content"
@@ -34,14 +42,16 @@
             android:stackFromBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_above="@+id/message"
-            android:layout_alignParentTop="true"/>
+            android:layout_below="@+id/filterField"/>
 
     <Button
+            style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Refresh"
-            android:id="@+id/refreshButton"
+            android:text="Clear"
+            android:id="@+id/clearFilterButton"
             android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"/>
+            android:layout_alignParentRight="true"
+            android:visibility="gone"/>
 
 </RelativeLayout>

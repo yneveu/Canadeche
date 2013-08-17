@@ -103,7 +103,7 @@ public class MessagesDataSource {
 
                 if( debug)
                     Log.d( TAG, "Quietboard  " + "boardconfig_"+ inputMessage.getBoard() + "_checkbox_boardlogin") ;
-                notifyOnNewPost( inputMessage, "New message on board" + inputMessage.getBoard() );
+                notifyOnNewPost( inputMessage, "New message on board " + inputMessage.getBoard() );
             }
             return insertId;
         }
@@ -120,7 +120,6 @@ public class MessagesDataSource {
 
             Intent intent = new Intent( context, MainActivityDrawer.class);
             PendingIntent pIntent = PendingIntent.getActivity( context, 0, intent, 0);
-
             //Format norloge
             String sClock= String.valueOf( inputMessage.getTime());
             final String hour=sClock.substring( 8, 10);
