@@ -1,7 +1,5 @@
 package fr.gabuzomeu.canadeche;
 
-import android.util.Log;
-
 public class Message implements Comparable {
 
     //private int boardId;

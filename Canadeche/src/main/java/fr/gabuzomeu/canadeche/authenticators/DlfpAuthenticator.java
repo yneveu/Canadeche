@@ -1,7 +1,6 @@
 package fr.gabuzomeu.canadeche.authenticators;
 
 import android.content.ContentValues;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.apache.http.HttpResponse;
