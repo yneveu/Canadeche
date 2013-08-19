@@ -187,7 +187,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements Filterable 
     public Filter getFilter() {
         if ( norlogeFilter == null)
             norlogeFilter = new NorlogeFilter();
-
+        else norlogeFilter.performFiltering( "");
         return norlogeFilter;
     }
 
@@ -207,6 +207,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements Filterable 
                     }
 
                 }
+
                 results.values = fullMessageList;
                 results.count = fullMessageList.size();
 

@@ -161,7 +161,7 @@ public class BoardFragment extends Fragment {
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    System.out.println("Text ["+s+"]");
+                    Log.d( TAG, "Filter: Text ["+s+"]");
                     adapter.getFilter().filter(s.toString());
                 }
 
@@ -213,7 +213,7 @@ public class BoardFragment extends Fragment {
 
 
         public void displaySearchBar( String filter){
-
+            adapter.getFilter().filter( null);
             if( filterEditText.isShown() && filter == null){
                 filterEditText.setVisibility( View.GONE);
                 filterFieldClear.setVisibility( View.GONE);

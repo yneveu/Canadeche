@@ -44,6 +44,8 @@ public class SettingsFragment extends PreferenceFragment {
         addPreferencesFromResource( R.xml.boardconfig_batavie);
         addPreferencesFromResource( R.xml.boardconfig_moules);
         addPreferencesFromResource( R.xml.boardconfig_bouchot);
+        if( debug)
+            addPreferencesFromResource( R.xml.boardconfig_tribunetest);
 
         Preference button = (Preference)findPreference("login_linuxfr_button");
         button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -82,7 +84,7 @@ public class SettingsFragment extends PreferenceFragment {
             }
         });
         AlertDialog.Builder alert = new AlertDialog.Builder(c);
-        alert.setTitle("Login/ Register");
+        alert.setTitle("Login");
         alert.setMessage(message);
         alert.setView(textEntryView);
         alert.setPositiveButton("Login", new DialogInterface.OnClickListener() {
