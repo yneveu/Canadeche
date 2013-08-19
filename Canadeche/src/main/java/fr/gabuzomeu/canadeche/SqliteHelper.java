@@ -22,7 +22,12 @@ public class SqliteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_LOGIN = "login";
     public static final String COLUMN_POST_ID = "post_id";
 
+    public static final String COLUMN_PARENT_POST_ID = "parent_post_id";
+    public static final String COLUMN_CHILD_POST_ID = "child_post_id";
+
+
     public static final String MESSAGES_TABLE = "messages";
+    public static final String ANSWERS_TABLE = "answers";
 
     private static final String CREATE_TABLE_MESSAGES = "CREATE TABLE IF NOT EXISTS " + MESSAGES_TABLE +"( "
             + COLUMN_BOARD_ID + " INTEGER , "
@@ -32,6 +37,10 @@ public class SqliteHelper extends SQLiteOpenHelper {
             + COLUMN_MESSAGE + " TEXT NOT NULL, "
             + COLUMN_LOGIN + " TEXT, "
             + COLUMN_POST_ID + " INTEGER )";
+
+    private static final String CREATE_TABLE_ANSWERS = " CREATE TABLE IF NOT EXISTS " + ANSWERS_TABLE + " ( "
+            + COLUMN_PARENT_POST_ID + " LONG , "
+            + COLUMN_CHILD_POST_ID + " LONG )";
 
 
 
@@ -48,6 +57,8 @@ public class SqliteHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL( CREATE_TABLE_MESSAGES);
+        sqLiteDatabase.execSQL( CREATE_TABLE_ANSWERS);
+
     }
 
     @Override

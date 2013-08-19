@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Filter;
@@ -26,12 +25,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class MessageAdapter extends ArrayAdapter<Message> implements Filterable {
+public class MessageAdapter extends ArrayAdapter<Missive> implements Filterable {
 
     private Context context;
-    private List<Message> messagesList;
+    private List<Missive> messagesList;
     //non filtered list
-    private List<Message> fullMessageList;
+    private List<Missive> fullMessageList;
     String boardName;
     private SharedPreferences prefs;
     boolean debug = false;
@@ -42,7 +41,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements Filterable 
     public static String TAG = "CanadecheMessageAdapter";
 
 
-    public MessageAdapter(Context context, int viewId, List<Message> messagesList, String _boardName, EditText _ed ) {
+    public MessageAdapter(Context context, int viewId, List<Missive> messagesList, String _boardName, EditText _ed ) {
         super( context, viewId, messagesList);
         this.context = context;
         prefs = PreferenceManager.getDefaultSharedPreferences( context);
@@ -58,7 +57,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements Filterable 
         return messagesList.size();
     }
 
-    public Message getItem(int position) {
+    public Missive getItem(int position) {
         return messagesList.get(position);
     }
 
@@ -71,7 +70,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements Filterable 
 
         int nbMessages = messagesList.size();
         //final Message message = messagesList.get( nbMessages - ( position + 1));
-        final Message message = messagesList.get(  position);
+        final Missive message = messagesList.get(  position);
         final ViewGroup vg = parent;
         View v = convertView;
 
@@ -200,7 +199,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements Filterable 
 
             if (constraint == null || constraint.length() == 0) {
                 // No filter implemented we return all the list
-                for ( Message m : fullMessageList) {
+                for ( Missive m : fullMessageList) {
                     if( m.getInFilter()){
                         m.setInFilter( false);
                         Log.d( TAG, "Invalidate filter on " + m.getMessage());
@@ -212,8 +211,8 @@ public class MessageAdapter extends ArrayAdapter<Message> implements Filterable 
                 results.count = fullMessageList.size();
 
             }else{
-                List<Message> filteredMessagesList = new ArrayList<Message>();
-                for ( Message m : fullMessageList) {
+                List<Missive> filteredMessagesList = new ArrayList<Missive>();
+                for ( Missive m : fullMessageList) {
 
                     String sClock= String.valueOf( m.getTime());
                     final String hour=sClock.substring( 8, 10);
@@ -244,7 +243,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements Filterable 
             if (results.count == 0)
                 notifyDataSetInvalidated();
             else {
-                messagesList = (List<Message>) results.values;
+                messagesList = (List<Missive>) results.values;
                 notifyDataSetChanged();
             }
         }
