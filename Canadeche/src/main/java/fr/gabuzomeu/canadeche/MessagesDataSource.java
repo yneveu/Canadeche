@@ -74,11 +74,11 @@ public class MessagesDataSource {
                 SqliteHelper.COLUMN_BOARD_ID + "=='" + inputMessage.getBoard() + "' AND " + SqliteHelper.COLUMN_POST_ID + " == " + inputMessage.getId();
 
         Cursor cursor = database.rawQuery( selectQuery , null);
-
+        //Log.d(TAG, "Parse new post ,My login here: " + prefs.getString( "boardconfig_"+ inputMessage.getBoard() + "_edittext_boardlogin", null) + " Message: " + inputMessage.toString());
         if( cursor.getCount() == 0){
 
             if( debug){
-                Log.d(TAG, "Ho, a new post --> " + inputMessage.toString());
+                Log.d(TAG, "Ho, a new post ,My login here: " + prefs.getString( "boardconfig_"+ inputMessage.getBoard() + "_edittext_boardlogin", null) + " Message: " + inputMessage.toString());
             }
 
             values.put( SqliteHelper.COLUMN_LOGIN, inputMessage.getLogin());
@@ -90,14 +90,18 @@ public class MessagesDataSource {
             long insertId = database.insert( SqliteHelper.MESSAGES_TABLE, null, values);
             cursor.close();
 
-            String comparedLogin = prefs.getString( "boardconfig_"+ inputMessage.getBoard() + "_edittext_boardlogin", "improbablestring87984qsfqezfeqz" ) + "<";
-            String comparedLoginEncoded = prefs.getString( "boardconfig_"+ inputMessage.getBoard() + "_edittext_boardlogin", "improbablestring87984qsfqezfeqz" ) + "&amp;lt;";
-            if( inputMessage.getMessage().contains( comparedLogin ) || inputMessage.getMessage().contains( comparedLoginEncoded )  ){
+            String boardLogin = prefs.getString( "boardconfig_"+ inputMessage.getBoard() + "_edittext_boardlogin", null);
+            if( boardLogin != null){
+
+            String comparedLogin = new String( boardLogin + "<").toLowerCase();
+            String comparedLoginEncoded = new String( boardLogin +  "&amp;lt;").toLowerCase();
+
+            if( inputMessage.getMessage().toLowerCase().contains( comparedLogin ) || inputMessage.getMessage().toLowerCase().contains( comparedLoginEncoded )  ){
                 if( debug)
                     Log.d( TAG, "Bigorno  " + "boardconfig_"+ inputMessage.getBoard() + "_edittext_boardlogin") ;
-                    notifyOnNewPost( inputMessage, "New personal message on board" + inputMessage.getBoard() );
+                notifyOnNewPost( inputMessage, "New personal message on board" + inputMessage.getBoard() );
             }
-
+            }
 
             if( prefs.getBoolean( "boardconfig_"+ inputMessage.getBoard() + "_checkbox_quietboard", false ) ){
 

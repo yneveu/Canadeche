@@ -46,13 +46,22 @@ public class CanadecheService extends Service {
 
     @Override
     public void onCreate() {
+
+        PreferenceManager.setDefaultValues( this, R.xml.preferences, false);
+        debug = PreferenceManager.getDefaultSharedPreferences( this).getBoolean( "pref_debug", false);
+        Log.d( TAG, "Debug is "  + debug);
+
         PreferenceManager.setDefaultValues( this, R.xml.boardconfig_linuxfr, false);
         PreferenceManager.setDefaultValues( this, R.xml.boardconfig_gabuzomeu, false);
         PreferenceManager.setDefaultValues( this, R.xml.boardconfig_euromussels, false);
         PreferenceManager.setDefaultValues( this, R.xml.boardconfig_see, false);
-        PreferenceManager.setDefaultValues( this, R.xml.preferences, false);
-        debug = PreferenceManager.getDefaultSharedPreferences( this).getBoolean( "pref_debug", false);
-        Log.d( TAG, "Debug is "  + debug);
+        PreferenceManager.setDefaultValues( this, R.xml.boardconfig_bouchot, false);
+        PreferenceManager.setDefaultValues( this, R.xml.boardconfig_moules, false);
+        PreferenceManager.setDefaultValues( this, R.xml.boardconfig_shoop, false);
+        if( debug)
+            PreferenceManager.setDefaultValues( this, R.xml.boardconfig_tribunetest, false);
+
+
         super.onCreate();
         startService();
     }
