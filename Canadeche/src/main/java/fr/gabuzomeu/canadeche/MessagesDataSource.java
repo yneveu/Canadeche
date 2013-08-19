@@ -15,8 +15,13 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by yann on 01/08/13.
@@ -67,7 +72,7 @@ public class MessagesDataSource {
     }
 
 
-    public long createMessage( Message inputMessage ){
+    public long createMessage( Missive inputMessage ){
         ContentValues values = new ContentValues();
 
         String selectQuery = "SELECT " + SqliteHelper.COLUMN_BOARD_ID + "," + SqliteHelper.COLUMN_POST_ID + " FROM " + SqliteHelper.MESSAGES_TABLE + " WHERE " +
@@ -109,6 +114,44 @@ public class MessagesDataSource {
                     Log.d( TAG, "Quietboard  " + "boardconfig_"+ inputMessage.getBoard() + "_checkbox_boardlogin") ;
                 notifyOnNewPost( inputMessage, "New message on board " + inputMessage.getBoard() );
             }
+
+
+
+
+              /*Find reefrences to other posts and fill answers table if needed*/
+            //Norloges
+            //Pour l'instant pas de multitribune ni de gestion des jours précédents ni de post à la même seconde...
+            //Pattern norlogesPattern = Pattern.compile("((?:1[0-2]|0[1-9])/(?:3[0-1]|[1-2][0-9]|0[1-9])#)?((?:2[0-3]|[0-1][0-9])):([0-5][0-9])(:[0-5][0-9])?([¹²³]|[:\\^][1-9]|[:\\^][1-9][0-9])?(@[A-Za-z0-9_]+)?");
+            Pattern norlogesPattern = Pattern.compile("(((?:2[0-3]|[0-1][0-9])):([0-5][0-9])(:[0-5][0-9])?)");
+            Matcher matcher =  norlogesPattern.matcher( inputMessage.getMessage() );
+
+            while( matcher.find()){
+                DateFormat df = new SimpleDateFormat("yyyyMMdd");
+                String today = df.format(new Date());
+                String norlogeParent = today + matcher.group(0);
+                norlogeParent = norlogeParent.replace( ":","");
+                Log.d( TAG, "This new post contains norloge! : " + matcher.group(0) + " have to query for " + norlogeParent + " in table" );
+
+                String parentIdQuery  = "select id from messages where time = '" + norlogeParent + "'";
+                Cursor cursor2 = database.rawQuery( parentIdQuery , null);
+
+                if( cursor2.getCount() == 0){
+                    Log.d( TAG, "This new post contains norloge with no parent :( ipot?");
+                }else{
+                    //Todo: peut renvoyer plusieurs, pour l'instant on prend uniquement le premier*/
+                    cursor2.moveToFirst();
+                    Log.d( TAG, "This post is answer to :" + cursor2.getLong( 0));
+                    String insertQuery = "INSERT INTO " + SqliteHelper.ANSWERS_TABLE + " VALUES ( " + cursor2.getLong( 0) + "," + insertId + ");";
+                    Log.d( TAG, "INSERT--> " + insertQuery);
+                    database.execSQL( insertQuery );
+                }
+                cursor2.close();
+            }
+
+
+
+
+
             return insertId;
         }
         cursor.close();
@@ -119,7 +162,7 @@ public class MessagesDataSource {
 
 
 
-        private void notifyOnNewPost( Message inputMessage, String reason){
+        private void notifyOnNewPost( Missive inputMessage, String reason){
             final NotificationManager notificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
 
             Intent intent = new Intent( context, MainActivityDrawer.class);
@@ -143,8 +186,8 @@ public class MessagesDataSource {
         }
 
 /**TODO: limit par tribune*/
-    public List<Message> getAllMessages( String inputBoard){
-       List<Message> messages = new ArrayList<Message>();
+    public List<Missive> getAllMessages( String inputBoard){
+       List<Missive> messages = new ArrayList<Missive>();
        Cursor cursor = database.query( SqliteHelper.MESSAGES_TABLE, allColumns, SqliteHelper.COLUMN_BOARD_ID + " == '" + inputBoard +"'", null, null, null, SqliteHelper.COLUMN_TIME, null);
 
        String postsAsString = PreferenceManager.getDefaultSharedPreferences( context).getString( "pref_max_post_displayed", "100");
@@ -156,7 +199,7 @@ public class MessagesDataSource {
            cursor.moveToPosition( cursor.getCount() - maxPosts );
 
         while (!cursor.isAfterLast()) {
-            Message mess = new Message();
+            Missive mess = new Missive();
             mess.setBoard( cursor.getString( 0));
             mess.setId( cursor.getInt( 6));
             mess.setInfo( cursor.getString( 3));
