@@ -34,9 +34,9 @@ public class BoardParser extends DefaultHandler {
     private boolean isTagEncoded = true;
 
     private String TAG = "CanadecheBoardParser";
-    private Message message;
+    private Missive message;
 
-    ArrayList<Message> messages;
+    ArrayList<Missive> messages;
     private SharedPreferences prefs;
 
 
@@ -49,7 +49,7 @@ public class BoardParser extends DefaultHandler {
             Log.d( TAG, "isTagEncoded  " + _boardName + " = " + isTagEncoded);
     }
 
-    public ArrayList<Message> getMessages() {
+    public ArrayList<Missive> getMessages() {
         return messages;
     }
 
@@ -82,7 +82,7 @@ public class BoardParser extends DefaultHandler {
         }else if ( localName.equals("login")){
             this.in_login=true;
         }else if ( localName.equals("post")){
-            message=new Message();
+            message=new Missive();
             message.setMessage( "");
             message.setId( Integer.parseInt( atts.getValue("id")));
             message.setTime( Long.parseLong( atts.getValue("time")));

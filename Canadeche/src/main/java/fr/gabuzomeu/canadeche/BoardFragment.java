@@ -48,12 +48,12 @@ public class BoardFragment extends Fragment {
         Button filterFieldClear;
 
         MessagesDataSource mds;
-        ArrayAdapter<Message> adapter;
+        ArrayAdapter<Missive> adapter;
 
         private static String TAG="Canadeche BoardFragment";
         ListView messagesListView;
         //static ArrayList<ArrayAdapter> adaptersList = new ArrayList();
-        List<Message> messages;
+        List<Missive> messages;
         String boardName;
 
         String prepopulatedMessage = "";

@@ -1,6 +1,6 @@
 package fr.gabuzomeu.canadeche;
 
-public class Message implements Comparable {
+public class Missive implements Comparable {
 
     //private int boardId;
     private String board;
@@ -73,9 +73,9 @@ public class Message implements Comparable {
         return backgroundColor;
     }
     public int compareTo(Object another) {
-        if ( ((Message)another).getTime() > this.getTime() )
+        if ( ((Missive)another).getTime() > this.getTime() )
             return 1;
-        else if (((Message)another).getTime() < this.getTime())
+        else if (((Missive)another).getTime() < this.getTime())
             return -1;
         else
             return 0;

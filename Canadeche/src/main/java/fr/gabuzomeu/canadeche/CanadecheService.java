@@ -201,13 +201,13 @@ public class CanadecheService extends Service {
                 FileReader fr = new FileReader( tmpFile);
                 xr.parse(new InputSource( fr));
                 tmpFile.delete();
-                ArrayList<Message> messageList = bParser.getMessages();
-                Iterator<Message> it = messageList.iterator();
+                ArrayList<Missive> messageList = bParser.getMessages();
+                Iterator<Missive> it = messageList.iterator();
 
                 MessagesDataSource mds = new MessagesDataSource( this);
                 mds.open();
                     while( it.hasNext()){
-                        Message mess = it.next();
+                        Missive mess = it.next();
                         mess.setBoard( (String)boardsId.get( i));
                         long postId = mds.createMessage( mess);
                         if( postId != -1)
