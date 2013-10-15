@@ -1,5 +1,7 @@
 package fr.gabuzomeu.canadeche;
 
+import java.util.ArrayList;
+
 public class Missive implements Comparable {
 
     //private int boardId;
@@ -11,7 +13,27 @@ public class Missive implements Comparable {
     private String login;
     private String backgroundColor;
 
+    public ArrayList<Long> getAnswersIds() {
+        return answersIds;
+    }
+
+    public void setAnswersIds(ArrayList<Long> answersIds) {
+        this.answersIds = answersIds;
+    }
+
+    public ArrayList<Long> getRespondToIds() {
+        return respondToIds;
+    }
+
+    public void setRespondToIds(ArrayList<Long> respondToIds) {
+        this.respondToIds = respondToIds;
+    }
+
+    private ArrayList<Long> answersIds;
+    private ArrayList<Long> respondToIds;
+
     private boolean inFilter = false;
+
 
 
     public boolean getInFilter(){

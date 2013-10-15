@@ -75,6 +75,8 @@ public class MessagesDataSource {
     public long createMessage( Missive inputMessage ){
         ContentValues values = new ContentValues();
 
+        ArrayList<Long>parentsId = new ArrayList<Long>();
+
         String selectQuery = "SELECT " + SqliteHelper.COLUMN_BOARD_ID + "," + SqliteHelper.COLUMN_POST_ID + " FROM " + SqliteHelper.MESSAGES_TABLE + " WHERE " +
                 SqliteHelper.COLUMN_BOARD_ID + "=='" + inputMessage.getBoard() + "' AND " + SqliteHelper.COLUMN_POST_ID + " == " + inputMessage.getId();
 
@@ -85,6 +87,39 @@ public class MessagesDataSource {
             if( debug){
                 Log.d(TAG, "Ho, a new post ,My login here: " + prefs.getString( "boardconfig_"+ inputMessage.getBoard() + "_edittext_boardlogin", null) + " Message: " + inputMessage.toString());
             }
+
+
+
+
+            /*Find references to other posts and fill answers table if needed*/
+            //Norloges
+            //Pour l'instant pas de multitribune ni de gestion des jours précédents ni de post à la même seconde...
+            //Pattern norlogesPattern = Pattern.compile("((?:1[0-2]|0[1-9])/(?:3[0-1]|[1-2][0-9]|0[1-9])#)?((?:2[0-3]|[0-1][0-9])):([0-5][0-9])(:[0-5][0-9])?([¹²³]|[:\\^][1-9]|[:\\^][1-9][0-9])?(@[A-Za-z0-9_]+)?");
+            Pattern norlogesPattern = Pattern.compile("(((?:2[0-3]|[0-1][0-9])):([0-5][0-9])(:[0-5][0-9])?)");
+            Matcher matcher =  norlogesPattern.matcher( inputMessage.getMessage() );
+
+            while( matcher.find()){
+                DateFormat df = new SimpleDateFormat("yyyyMMdd");
+                String today = df.format(new Date());
+                String norlogeParent = today + matcher.group(0);
+                norlogeParent = norlogeParent.replace( ":","");
+                Log.d( TAG, "This new post contains norloge! : " + matcher.group(0) + " have to query for " + norlogeParent + " in table" );
+
+                String parentIdQuery  = "select id from messages where time = '" + norlogeParent + "'";
+                Cursor cursor2 = database.rawQuery( parentIdQuery , null);
+
+                if( cursor2.getCount() == 0){
+                    Log.d( TAG, "This new post contains norloge with no parent :( ipot?");
+                }else{
+                    //Todo: peut renvoyer plusieurs, pour l'instant on prend uniquement le premier*/
+                    cursor2.moveToFirst();
+                    Log.d( TAG, "This post is answer to :" + cursor2.getLong( 0));
+                    parentsId.add( cursor2.getLong(0));
+                }
+                
+                cursor2.close();
+            }
+
 
             values.put( SqliteHelper.COLUMN_LOGIN, inputMessage.getLogin());
             values.put( SqliteHelper.COLUMN_INFO, inputMessage.getInfo());
@@ -118,37 +153,13 @@ public class MessagesDataSource {
 
 
 
-              /*Find reefrences to other posts and fill answers table if needed*/
-            //Norloges
-            //Pour l'instant pas de multitribune ni de gestion des jours précédents ni de post à la même seconde...
-            //Pattern norlogesPattern = Pattern.compile("((?:1[0-2]|0[1-9])/(?:3[0-1]|[1-2][0-9]|0[1-9])#)?((?:2[0-3]|[0-1][0-9])):([0-5][0-9])(:[0-5][0-9])?([¹²³]|[:\\^][1-9]|[:\\^][1-9][0-9])?(@[A-Za-z0-9_]+)?");
-            Pattern norlogesPattern = Pattern.compile("(((?:2[0-3]|[0-1][0-9])):([0-5][0-9])(:[0-5][0-9])?)");
-            Matcher matcher =  norlogesPattern.matcher( inputMessage.getMessage() );
-
-            while( matcher.find()){
-                DateFormat df = new SimpleDateFormat("yyyyMMdd");
-                String today = df.format(new Date());
-                String norlogeParent = today + matcher.group(0);
-                norlogeParent = norlogeParent.replace( ":","");
-                Log.d( TAG, "This new post contains norloge! : " + matcher.group(0) + " have to query for " + norlogeParent + " in table" );
-
-                String parentIdQuery  = "select id from messages where time = '" + norlogeParent + "'";
-                Cursor cursor2 = database.rawQuery( parentIdQuery , null);
-
-                if( cursor2.getCount() == 0){
-                    Log.d( TAG, "This new post contains norloge with no parent :( ipot?");
-                }else{
-                    //Todo: peut renvoyer plusieurs, pour l'instant on prend uniquement le premier*/
-                    cursor2.moveToFirst();
-                    Log.d( TAG, "This post is answer to :" + cursor2.getLong( 0));
-                    String insertQuery = "INSERT INTO " + SqliteHelper.ANSWERS_TABLE + " VALUES ( " + cursor2.getLong( 0) + "," + insertId + ");";
-                    Log.d( TAG, "INSERT--> " + insertQuery);
-                    database.execSQL( insertQuery );
-                }
-                cursor2.close();
-            }
 
 
+for( int i = 0 ; i < parentsId.size(); i++){
+    String insertQuery = "INSERT INTO " + SqliteHelper.ANSWERS_TABLE + " VALUES ( " + parentsId.get( i) + "," + insertId + ");";
+    Log.d( TAG, "INSERT--> " + insertQuery);
+    database.execSQL( insertQuery );
+}
 
 
 
@@ -186,7 +197,7 @@ public class MessagesDataSource {
         }
 
 /**TODO: limit par tribune*/
-    public List<Missive> getAllMessages( String inputBoard){
+    public List<Missive> getAllMissives(String inputBoard){
        List<Missive> messages = new ArrayList<Missive>();
        Cursor cursor = database.query( SqliteHelper.MESSAGES_TABLE, allColumns, SqliteHelper.COLUMN_BOARD_ID + " == '" + inputBoard +"'", null, null, null, SqliteHelper.COLUMN_TIME, null);
 

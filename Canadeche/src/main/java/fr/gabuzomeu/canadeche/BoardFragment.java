@@ -141,7 +141,7 @@ public class BoardFragment extends Fragment {
             mds = new MessagesDataSource( getActivity());
             mds.open();
 
-            messages = mds.getAllMessages( getArguments().getString(ARG_SECTION_ID ));
+            messages = mds.getAllMissives(getArguments().getString(ARG_SECTION_ID));
             adapter = new MessageAdapter( getActivity(), R.layout.messagerow, messages, boardName, (EditText)rootView.findViewById( R.id.message));
 
             Log.d(TAG, "IN CREATEVIEW " + getArguments().getString(ARG_SECTION_ID) + " ADAPTER: " + adapter);
@@ -207,7 +207,7 @@ public class BoardFragment extends Fragment {
 
             mds.open();
             messages.clear();
-            messages.addAll(mds.getAllMessages(boardName));
+            messages.addAll(mds.getAllMissives(boardName));
             adapter.notifyDataSetChanged();
         }
 
