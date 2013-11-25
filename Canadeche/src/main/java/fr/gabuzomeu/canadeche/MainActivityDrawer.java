@@ -14,6 +14,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -28,13 +29,17 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -63,7 +68,7 @@ public class MainActivityDrawer extends Activity {
     private boolean mIsBound;
     private static CanadecheService mBoundService;
 
-
+    public static final int CHOOSETOTOZ = 1;
     public static String appName = "Canadeche";
     public static String appVersion="0.1";
 
@@ -79,6 +84,10 @@ public class MainActivityDrawer extends Activity {
     private ActionBarDrawerToggle mDrawerToggle;
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
+
+
+    ImageView iv;
+    Menu mMenu = null;
 
     BoardFragment currentFragment;
 
@@ -147,6 +156,8 @@ public class MainActivityDrawer extends Activity {
 
         doBindService();
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("refresh-board"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("start-refresh-board"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("finished-refresh-board"));
 
         if( PreferenceManager.getDefaultSharedPreferences( this).getBoolean( "pref_fullscreen", false) ){
             requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -338,6 +349,7 @@ public class MainActivityDrawer extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        mMenu = menu;
         return true;
     }
 
@@ -411,6 +423,10 @@ public class MainActivityDrawer extends Activity {
                 Intent intent = new Intent(this, SettingsActivity.class);
                 this.startActivity(intent);
                 break;
+            case R.id.action_totoz:
+                Intent i = new Intent(this, TotozManager.class);
+                startActivityForResult(i, CHOOSETOTOZ);
+                break;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -467,14 +483,40 @@ public class MainActivityDrawer extends Activity {
         @Override
         public void onReceive( Context context, Intent intent) {
             String message = intent.getStringExtra("message");
-            if( debug){
-                Log.d("receiver", "Got message: " + message);
-                Toast.makeText( MainActivityDrawer.this, String.valueOf( System.currentTimeMillis()) , Toast.LENGTH_SHORT).show();
+            String action = intent.getAction();
+
+            if( action.compareTo( "refresh-board") == 0){
+                if( debug){
+                    Log.d("receiver", "Got message: " + message);
+                    Toast.makeText( MainActivityDrawer.this, String.valueOf( System.currentTimeMillis()) , Toast.LENGTH_SHORT).show();
+                }
+                if( currentFragment != null){
+                    if( debug)
+                        Log.d( TAG, "Current fragment is refreshed");
+                        currentFragment.refreshContent();
+                    }
             }
-            if( currentFragment != null){
-                if( debug)
-                    Log.d( TAG, "Current fragment is refreshed");
-                currentFragment.refreshContent();
+            else if( action.compareTo( "start-refresh-board") == 0){
+                if( debug){
+                    Log.d( TAG, "End start refresh board from service");
+                }
+
+                LayoutInflater inflater = (LayoutInflater) getApplication()
+                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                iv = (ImageView) inflater.inflate(R.layout.action_refresh,
+                        null);
+                Animation rotation = AnimationUtils.loadAnimation(getApplication(),
+                        R.anim.refresh_rotate);
+                rotation.setRepeatCount( 2);
+                iv.startAnimation(rotation);
+               // if( mMenu != null)
+               //     mMenu.getItem( 0).setActionView( iv);
+            }
+            else if( action.compareTo( "finished-refresh-board") == 0){
+                if( debug){
+                    Log.d( TAG, "Finished refresh board from service");
+                }
+                iv.clearAnimation();
             }
         }
     };
@@ -618,7 +660,25 @@ public class MainActivityDrawer extends Activity {
     }
 
 
+    protected void onActivityResult( int requestCode, int resultCode, Intent data) {
+        Log.d( TAG, "onActivityResult requestCode:" + requestCode);
+        Log.d( TAG, "onActivityResult resultCode:" + resultCode);
+        switch( requestCode){
 
+            case CHOOSETOTOZ:
+                if( resultCode == RESULT_OK){
+                    String result=data.getStringExtra("totoz");
+                    Log.d( TAG, "Totoz manager returned 1:" + result);
+
+                    currentFragment.addPostString( result);
+                    Log.d( TAG, "Totoz manager returned 2:" + result);
+                    break;
+                }
+                if (resultCode == RESULT_CANCELED) {
+                //Write your code if there's no result
+                }
+        }
+    }//onActivityResult
 
 
 }

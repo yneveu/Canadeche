@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Paint;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Editable;
@@ -32,6 +34,7 @@ import org.apache.http.protocol.HTTP;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +49,7 @@ public class BoardFragment extends Fragment {
         Button postButton;
         EditText filterEditText;
         Button filterFieldClear;
+        EditText et;
 
         MessagesDataSource mds;
         ArrayAdapter<Missive> adapter;
@@ -88,9 +92,18 @@ public class BoardFragment extends Fragment {
 
             View layout = inflater.inflate(R.layout.totoz_popup, null);
             WebView wView = (WebView) layout.findViewById( R.id.webView);
+
             wView.getSettings().setBuiltInZoomControls(true);
+
             //wView.getSettings().setDefaultZoom( WebSettings.ZoomDensity.FAR);
-            wView.loadData("<html><head><style type='text/css'>body{margin:auto auto;text-align:center;} img{width:50%25;} </style></head><body><img src='" + "http://totoz.eu/img/" + _totoz +"'/></body></html>" ,"text/html",  "UTF-8");
+            wView.loadData("<html><head></head><body background=\"#00000000\"><img src='" + "http://totoz.eu/img/" + _totoz +"'/></body></html>" ,"text/html",  "UTF-8");
+            wView.setBackgroundColor(0x00000000);
+            if (Build.VERSION.SDK_INT >= 11) // Android v3.0+
+                try {
+                    Method method = View.class.getMethod("setLayerType", int.class, Paint.class);
+                    method.invoke( wView, 1, new Paint()); // 1 = LAYER_TYPE_SOFTWARE (API11)
+                } catch (Exception e) {
+                }
             imageDialog.setTitle("[:" + _totoz + "]");
             imageDialog.setView(layout);
             imageDialog.setPositiveButton( R.string.ok_button, new DialogInterface.OnClickListener(){
@@ -120,6 +133,7 @@ public class BoardFragment extends Fragment {
             //    TextView dummyTextView = (TextView) rootView.findViewById(R.id.section_label);
             //  dummyTextView.setText("PLOP " + Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
 
+            et = (EditText)rootView.findViewById( R.id.message);
 
             postButton =(Button)rootView.findViewById( R.id.postButton);
             postButton.setOnClickListener( new View.OnClickListener(){
@@ -206,9 +220,19 @@ public class BoardFragment extends Fragment {
             Log.d(TAG, "adapter " + adapter);
 
             mds.open();
+
+            //To keep position in list
+            int index = messagesListView.getFirstVisiblePosition();
+            View v = messagesListView.getChildAt( 0);
+            int top = ( v == null) ? 0 : v.getTop();
+            //
+
             messages.clear();
-            messages.addAll(mds.getAllMissives(boardName));
+            messages.addAll( mds.getAllMissives(boardName));
             adapter.notifyDataSetChanged();
+
+            //restore list position
+            messagesListView.setSelectionFromTop( index, top);
         }
 
 
@@ -301,7 +325,14 @@ public class BoardFragment extends Fragment {
         }
 
 
+public void addPostString( String aString){
+    int start = Math.max( et.getSelectionStart(), 0);
+    int end = Math.max( et.getSelectionEnd(), 0);
+    et.getText().replace(Math.min(start, end), Math.max(start, end),
+            aString, 0, aString.length());
+    et.requestFocus();
 
+}
 
 
 

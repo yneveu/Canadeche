@@ -14,7 +14,9 @@
             android:id="@+id/webView"
             android:layout_centerInParent="true"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"/>
+            android:layout_height="fill_parent"
+            android:background="@android:color/transparent"
+            android:layerType="software"/>
 
 
 

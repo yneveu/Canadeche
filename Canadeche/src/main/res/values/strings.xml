@@ -67,5 +67,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_search">Search</string>
     <string name="action_refresh">Refresh</string>
+    <string name="launch_totoz_manager">Launch totoz manager</string>
+    <string name="search_totoz_button_label">Search</string>
 
 </resources>

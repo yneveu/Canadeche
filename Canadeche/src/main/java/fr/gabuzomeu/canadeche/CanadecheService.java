@@ -134,7 +134,7 @@ public class CanadecheService extends Service {
             reloadBoardsConfig();
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
             boolean sticky = prefs.getBoolean( "pref_stickyservice", true);
-            if( sticky)
+            //if( sticky)
                 fetchNewPosts( true);
             return null;
         }
@@ -164,6 +164,12 @@ public class CanadecheService extends Service {
 
 
     public int fetchNewPosts( boolean all){
+
+        Intent startIntent = new Intent("start-refresh-board");
+        startIntent.putExtra("message", "SERVICE START REFRESH");
+        LocalBroadcastManager.getInstance( getBaseContext()).sendBroadcast( startIntent);
+
+
 
         int newmessCounter=0;
 
@@ -224,9 +230,12 @@ public class CanadecheService extends Service {
             intent.putExtra("message", "SERVICE REFRESH");
             LocalBroadcastManager.getInstance( getBaseContext()).sendBroadcast( intent);
         }
+        Intent intentFinished = new Intent("finished-refresh-board");
+        intentFinished.putExtra("message", "SERVICE REFRESH");
+        LocalBroadcastManager.getInstance( getBaseContext()).sendBroadcast( intentFinished);
         return 1;
 
-    }
 
+    }
 
 }

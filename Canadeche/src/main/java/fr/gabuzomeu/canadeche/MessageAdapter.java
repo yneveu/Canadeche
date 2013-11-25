@@ -110,7 +110,13 @@ public class MessageAdapter extends ArrayAdapter<Missive> implements Filterable 
             public void onClick(View v) {
                 Log.i( TAG, "SEND BOARD ID : " + message.getBoard() +1 );
                 TextView clicked = ( TextView)v;
-                ed.setText( hour + ":" + minutes +":" + seconds + " ");
+
+                String stringToInsert = hour + ":" + minutes +":" + seconds + " ";
+
+                int start = Math.max( ed.getSelectionStart(), 0);
+                int end = Math.max( ed.getSelectionEnd(), 0);
+                ed.getText().replace(Math.min(start, end), Math.max(start, end),
+                stringToInsert, 0, stringToInsert.length());
             }
         };
 
